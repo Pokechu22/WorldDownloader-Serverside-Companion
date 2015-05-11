@@ -1,3 +1,42 @@
-#The radius of nearby chunks that the player can save.
-#If -1, the serverside renderdistance value will be used instead.
-saveRadius: -1
+# WorldDownloader Serverside Companion configuration file.
+# 
+# There are permissions that override each of these settings, by the name of
+# "wdl.overrideXXX".  They are given to ops by default.
+
+wdl: 
+  # Whether all players are allowed to download the world in general.
+  # If false, they aren't allowed.
+  canDownloadInGeneral: true
+  
+  # The distance from a player that WDL can save chunks.  Use this to limit
+  # the area a player can download.  If set to -1, the value for the server
+  # in the server config ("view-distance") is used.
+  saveRadius: -1
+  
+  # Whether a player can cache chunks as they move.  In essence, this means
+  # that if the value is true, the player can download the entire map while
+  # moving about, but if false, the player will only save the nearby chunks
+  # when they stop download.  This doesn't really stop a player from saving
+  # the entire map (they could still combine the parts if they wanted), but
+  # it will be far harder for a player to do so.
+  canCacheChunks: true
+  
+  # Whether or not a player can save entities in the map.  This controls if
+  # a player can save the location, appearance, inventory contents, and any
+  # other information about an animal, monster, or other thing.
+  canSaveEntities: true
+  
+  # Whether a player can save all tile entities as they move about the map.
+  # Tile entities (officially, "Block Entities") store additional meta-data
+  # for blocks, such as sign text, chest items, and banner patterns.  There
+  # are two types that matter to WDL: Ones that have their data sent to the
+  # client automatically (such as signs and banners) and ones that need the
+  # player to manually open them (containers, such as chests).  For the 2nd
+  # group, the setting "wdl.canSaveContainers" must also be true for saving
+  # to be allowed. 
+  canSaveTileEntities: true
+  
+  # Whether a player can save containers that require opening to save their
+  # contents, such as chests.  For this setting to be meaningful, the value
+  # of "wdl.canSaveTileEntities" must be true.  
+  canSaveContainers: true
