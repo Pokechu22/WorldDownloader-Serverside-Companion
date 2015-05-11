@@ -1,10 +1,15 @@
 package wdl;
 
+import java.io.IOException;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.Metrics;
+import org.mcstats.Metrics.Graph;
+import org.mcstats.Metrics.Plotter;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -33,6 +38,62 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 
 		this.getServer().getPluginManager().registerEvents(this, this);
+
+		try {
+			class ConfigBooleanPlotter extends Plotter {
+				public ConfigBooleanPlotter(String key) {
+					super(getConfig().getBoolean(key) ? "true" : "false");
+				}
+
+				@Override
+				public int getValue() {
+					return 1;
+				}
+			}
+
+			Metrics metrics = new Metrics(this);
+
+			int saveRadius = getConfig().getInt("wdl.saveRadius", -1);
+			String saveRadiusText = (saveRadius >= 0 ? (saveRadius + " chunks")
+					: "Server view distance");
+
+			Graph globalEnabledGraph = metrics
+					.createGraph("Config: canDownloadInGeneral");
+			globalEnabledGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canDownloadInGeneral"));
+
+			Graph saveRadiusGraph = metrics.createGraph("Config: saveRadius");
+			saveRadiusGraph.addPlotter(new Plotter(saveRadiusText) {
+				@Override
+				public int getValue() {
+					return 1;
+				}
+			});
+
+			Graph canCacheChunksGraph = metrics
+					.createGraph("Config: canCacheChunks");
+			canCacheChunksGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canCacheChunks"));
+
+			Graph canSaveEntitiesGraph = metrics
+					.createGraph("Config: canSaveEntities");
+			canSaveEntitiesGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canSaveEntities"));
+
+			Graph canSaveTileEntitiesGraph = metrics
+					.createGraph("Config: canSaveTileEntities");
+			canSaveTileEntitiesGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canSaveTileEntities"));
+
+			Graph canSaveContainersGraph = metrics
+					.createGraph("Config: canSaveContainers");
+			canSaveContainersGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canSaveContainers"));
+
+			metrics.start();
+		} catch (IOException e) {
+			getLogger().warning("Failed to start PluginMetrics :(");
+		}
 	}
 
 	@Override
