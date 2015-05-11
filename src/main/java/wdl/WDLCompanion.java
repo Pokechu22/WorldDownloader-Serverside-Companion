@@ -52,16 +52,8 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 							+ " connected with WDL enabled!");
 		}
 
-		player.sendPluginMessage(
-				this,
-				CONTROL_CHANNEL_NAME,
-				createWDLPacket(
-						player.hasPermission("wdl.canDownloadInGeneral"),
-						getDownloadRadius(player),
-						player.hasPermission("wdl.cacheChunks"),
-						player.hasPermission("wdl.saveEntities"),
-						player.hasPermission("wdl.saveTileEntities"),
-						player.hasPermission("wdl.saveContainers")));
+		player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
+				createWDLPacket(player));
 	}
 
 	/**
@@ -72,7 +64,7 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 	 *            The player to get the download radius of.
 	 * @return The download radius applicable to that player.
 	 */
-	private int getDownloadRadius(Player player) {
+	private int getSaveRadius(Player player) {
 		final int configDownloadRadius = getConfig().getInt("saveRadius", -1);
 		final int serverViewDistance = getServer().getViewDistance();
 
@@ -88,11 +80,55 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 	}
 
 	/**
+	 * Gets a value from the config for the given player, unless it is
+	 * overwritten.
+	 * 
+	 * @param player
+	 *            The player to check permissions for.
+	 * @param configKey
+	 *            The key in the config to check.
+	 * @param overridePerm
+	 *            The permission that overrides the config value.
+	 * @return The value from the config or permissions.
+	 */
+	private boolean getConfigValue(Player player, String configKey,
+			String overridePerm) {
+		if (player.hasPermission(overridePerm)) {
+			return true;
+		} else {
+			return getConfig().getBoolean(configKey);
+		}
+	}
+
+	/**
+	 * Creates the byte arrays for the WDL packet.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	private byte[] createWDLPacket(Player player) {
+		boolean globalIsEnabled = getConfigValue(player,
+				"wdl.canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
+		int saveRadius = getSaveRadius(player);
+		boolean cacheChunks = getConfigValue(player, "wdl.canCacheChunks",
+				"wdl.overrideCanCacheChunks");
+		boolean saveEntities = getConfigValue(player, "wdl.canSaveEntities",
+				"wdl.overrideCanSaveEntities");
+		boolean saveTileEntities = getConfigValue(player,
+				"wdl.canSaveTileEntities", "wdl.overrideCanSaveTileEntities");
+		boolean saveContainers = getConfigValue(player,
+				"wdl.canSaveContainers", "wdl.overrideCanSaveContainers");
+
+		return createWDLPacket(globalIsEnabled, saveRadius, cacheChunks,
+				saveEntities, saveTileEntities, saveContainers);
+	}
+
+	/**
 	 * Creates a byte array for the WDL control packet.
 	 * 
 	 * @param globalIsEnabled
 	 *            Whether or not all of WDL is enabled.
-	 * @param radius
+	 * @param saveRadius
 	 *            The distance of chunks that WDL can download from the player's
 	 *            position.
 	 * @param cacheChunks
@@ -118,7 +154,7 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 	 *            saved by players as they are opened.
 	 * @return The byte array used for creating that plugin channel message.
 	 */
-	private final byte[] createWDLPacket(boolean globalIsEnabled, int radius,
+	private byte[] createWDLPacket(boolean globalIsEnabled, int saveRadius,
 			boolean cacheChunks, boolean saveEntities,
 			boolean saveTileEntities, boolean saveContainers) {
 		final int VERSION = 1;
@@ -128,7 +164,7 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 		output.writeInt(VERSION);
 
 		output.writeBoolean(globalIsEnabled);
-		output.writeInt(radius);
+		output.writeInt(saveRadius);
 		output.writeBoolean(cacheChunks && globalIsEnabled);
 		output.writeBoolean(saveEntities && globalIsEnabled);
 		output.writeBoolean(saveTileEntities && globalIsEnabled);
