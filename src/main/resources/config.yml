@@ -1,0 +1,3 @@
+#The radius of nearby chunks that the player can save.
+#If -1, the serverside renderdistance value will be used instead.
+saveRadius: -1

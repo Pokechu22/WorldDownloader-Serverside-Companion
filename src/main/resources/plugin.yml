@@ -1,0 +1,56 @@
+name: WDLCompanion
+main: wdl.WDLCompanion
+version: 0.0.1
+author: Pokechu22
+description: |
+  This plugin provides a set of permissions that control what WorldDownloader
+  (a mod that downloads a Minecraft world on a server; also known as WDL) may
+  download.
+
+permissions: 
+  wdl.canDownloadInGeneral: 
+    default: true
+    description: |
+      If a player does not have this permission, they are not allowed to save
+      with WDL at all.  Otherwise, they are allowed to save the terrain block
+      data, and additionally any other data based off of the permissions that
+      they have from the "wdl.save" permissions below.  
+  wdl.fullDownloadRadius: 
+    default: op
+    description: |
+      If a player has this permission, they are allowed to download chunks at
+      the full server chunk load distance.  Otherwise, they can only download
+      at the maximum distance specified in the configuration file.  (Although
+      if the value in the configuration file is negative, the player can save
+      chunks all the way up to the server view distance regardless of if they
+      have this permission or not.)   
+  wdl.cacheChunks: 
+    default: true
+    description: |
+      If a player does not have this permission, they are not allowed to save
+      chunks that they are no longer standing in.  In other words, the player
+      is not allowed to save the entire world (at least not easily), but only
+      very small sections.
+  wdl.saveEntities: 
+    default: true
+    description: |
+      If a player does not have this permission, they are not allowed to save
+      entities.  This includes the entity naming, contents of any chests, and
+      the entity's appearance. 
+  wdl.saveTileEntities: 
+    default: true
+    description: |
+      If a player does not have this permission, they are not allowed to save
+      tile entities.  Tile entities (officially named "Block Entities") store
+      data beyond the normal data for a block, such as sign text or container
+      contents.  Note that this permission only covers tile entities that are
+      sent to the client without the client opening to them, and thus another
+      permission is required for chests and similar tile entities to be saved
+      in addition to this one ("wdl.saveContainers").
+  wdl.saveContainers: 
+    default: true
+    description: |
+      If a player does not have this permission, they are not allowed to save
+      container tile entities that they need to manually open.  Note that for
+      this permission to even be considered, they also need the permission of
+      "wdl.saveTileEntities".
