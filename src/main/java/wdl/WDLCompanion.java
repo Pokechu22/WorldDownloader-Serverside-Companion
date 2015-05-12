@@ -128,7 +128,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @return The download radius applicable to that player.
 	 */
 	private int getSaveRadius(Player player) {
-		final int configDownloadRadius = getConfig().getInt("saveRadius", -1);
+		final int configDownloadRadius = getConfig().getInt("wdl.saveRadius", -1);
 		final int serverViewDistance = getServer().getViewDistance();
 
 		if (configDownloadRadius <= -1) {
