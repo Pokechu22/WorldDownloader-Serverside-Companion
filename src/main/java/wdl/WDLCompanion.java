@@ -3,10 +3,9 @@ package wdl;
 import java.io.IOException;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
@@ -24,7 +23,12 @@ import com.google.common.io.ByteStreams;
  * @author Pokechu22
  *
  */
-public class WDLCompanion extends JavaPlugin implements Listener {
+public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageListener {
+	/**
+	 * The name of the plugin channel used for WDL control.
+	 */
+	private static final String INIT_CHANNEL_NAME = "WDL|INIT";
+	
 	/**
 	 * The name of the plugin channel used for WDL control.
 	 */
@@ -35,10 +39,10 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 		this.saveDefaultConfig();
 
 		this.getServer().getMessenger()
+				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME, this);
+		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
-
-		this.getServer().getPluginManager().registerEvents(this, this);
-
+		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
 				public ConfigBooleanPlotter(String key) {
@@ -99,22 +103,20 @@ public class WDLCompanion extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		this.getServer().getMessenger()
+				.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME);
+		this.getServer().getMessenger()
 				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 	}
 
-	@EventHandler
-	public void onPlayerLogin(PlayerLoginEvent e) {
-		Player player = e.getPlayer();
+	@Override
+	public void onPluginMessageReceived(String channel, Player player,
+			byte[] data) {
+		if (channel.equals(INIT_CHANNEL_NAME)) {
+			getLogger().info("Player " + player + " connected with WDL enabled!");
 
-		if (e.getPlayer().getListeningPluginChannels()
-				.contains(CONTROL_CHANNEL_NAME)) {
-			getLogger().info(
-					"Player " + e.getPlayer().toString()
-							+ " connected with WDL enabled!");
+			player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
+					createWDLPacket(player));
 		}
-
-		player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
-				createWDLPacket(player));
 	}
 
 	/**
