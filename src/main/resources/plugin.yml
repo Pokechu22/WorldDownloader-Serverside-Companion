@@ -1,6 +1,6 @@
 name: WDLCompanion
 main: wdl.WDLCompanion
-version: 0.0.1
+version: 1.0.0
 author: Pokechu22
 description: |
   This plugin provides a set of permissions that control what WorldDownloader
