@@ -4,8 +4,13 @@
 # "wdl.overrideXXX".  They are given to ops by default.
 
 wdl: 
-  # Whether all players are allowed to download the world in general.
-  # If false, they aren't allowed.
+  # Whether the client can use features of WDL that are from newer versions
+  # than this plugin is aware of (essentially, this provides a default that
+  # is used with unrecognized features).
+  canDoNewThings: true
+  
+  # Whether players are allowed to download the world in general.  If false
+  # they aren't allowed (the mod is fully disabled).
   canDownloadInGeneral: true
   
   # The distance from a player that WDL can save chunks.  Use this to limit

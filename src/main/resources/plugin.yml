@@ -1,13 +1,19 @@
 name: WDLCompanion
 main: wdl.WDLCompanion
-version: 1.0.0
+version: 1.0.1
 author: Pokechu22
 description: |
   This plugin provides a set of permissions that control what WorldDownloader
   (a mod that downloads a Minecraft world on a server; also known as WDL) may
   download.
 
-permissions: 
+permissions:
+  wdl.overrideCanDoNewThings: 
+    default: op
+    description: |
+      If a player has this permission, they are allowed to use functions that
+      are not known to this plugin regardless of the value of what is set for
+      "wdl.canDoNewThings" in the config.
   wdl.overrideCanDownloadInGeneral: 
     default: op
     description: |

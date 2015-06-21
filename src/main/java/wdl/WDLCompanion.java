@@ -61,6 +61,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			String saveRadiusText = (saveRadius >= 0 ? (saveRadius + " chunks")
 					: "Server view distance");
 
+			Graph canDoNewThingsGraph = metrics
+					.createGraph("Config: canDoNewThings");
+			canDoNewThingsGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.canDoNewThings"));
+			
 			Graph globalEnabledGraph = metrics
 					.createGraph("Config: canDownloadInGeneral");
 			globalEnabledGraph.addPlotter(new ConfigBooleanPlotter(
@@ -112,10 +117,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	public void onPluginMessageReceived(String channel, Player player,
 			byte[] data) {
 		if (channel.equals(INIT_CHANNEL_NAME)) {
-			getLogger().info("Player " + player + " connected with WDL enabled!");
+			getLogger().info("Player " + player.getName() + 
+					" has WDL enabled.");
 
-			player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
-					createWDLPacket(player));
+			byte[][] packets = createWDLPackets(player);
+			
+			for (byte[] packet : packets) {
+				player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
+						packet);
+			}
 		}
 	}
 
@@ -129,14 +139,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 */
 	private int getSaveRadius(Player player) {
 		final int configDownloadRadius = getConfig().getInt("wdl.saveRadius", -1);
-		final int serverViewDistance = getServer().getViewDistance();
-
+		
 		if (configDownloadRadius <= -1) {
-			return serverViewDistance;
+			return -1;
 		}
 
 		if (player.hasPermission("wdl.fullDownloadRadius")) {
-			return serverViewDistance;
+			return -1;
 		} else {
 			return configDownloadRadius;
 		}
@@ -164,12 +173,20 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 
 	/**
-	 * Creates the byte arrays for the WDL packet.
+	 * Creates the byte arrays for all of the WDL packets.
 	 * 
 	 * @param player
 	 * @return
 	 */
-	private byte[] createWDLPacket(Player player) {
+	private byte[][] createWDLPackets(Player player) {
+		byte[][] packets = new byte[2][];
+		
+		//Packet #0
+		boolean canDoNewThings = getConfigValue(player, 
+				"wdl.canDoNewThings", "wdl.overrideCanDoNewThings");
+		packets[0] = createWDLPacket0(canDoNewThings);
+		
+		//Packet #1
 		boolean globalIsEnabled = getConfigValue(player,
 				"wdl.canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
 		int saveRadius = getSaveRadius(player);
@@ -182,12 +199,33 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		boolean saveContainers = getConfigValue(player,
 				"wdl.canSaveContainers", "wdl.overrideCanSaveContainers");
 
-		return createWDLPacket(globalIsEnabled, saveRadius, cacheChunks,
+		packets[1] = createWDLPacket1(globalIsEnabled, saveRadius, cacheChunks,
 				saveEntities, saveTileEntities, saveContainers);
+		
+		
+		return packets;
 	}
 
 	/**
-	 * Creates a byte array for the WDL control packet.
+	 * Creates a byte array for the WDL control packet #0.
+	 * 
+	 * @param canDoNewThings
+	 *            Whether players can use new functions that aren't known to
+	 *            this plugin.
+	 * @return
+	 */
+	private byte[] createWDLPacket0(boolean canDoNewThings) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+
+		output.writeInt(0);
+		
+		output.writeBoolean(canDoNewThings);
+		
+		return output.toByteArray();
+	}
+
+	/**
+	 * Creates a byte array for the WDL control packet #1.
 	 * 
 	 * @param globalIsEnabled
 	 *            Whether or not all of WDL is enabled.
@@ -217,14 +255,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 *            saved by players as they are opened.
 	 * @return The byte array used for creating that plugin channel message.
 	 */
-	private byte[] createWDLPacket(boolean globalIsEnabled, int saveRadius,
+	private byte[] createWDLPacket1(boolean globalIsEnabled, int saveRadius,
 			boolean cacheChunks, boolean saveEntities,
 			boolean saveTileEntities, boolean saveContainers) {
-		final int VERSION = 1;
-
 		ByteArrayDataOutput output = ByteStreams.newDataOutput();
 
-		output.writeInt(VERSION);
+		output.writeInt(1);
 
 		output.writeBoolean(globalIsEnabled);
 		output.writeInt(saveRadius);
