@@ -2,6 +2,8 @@ package wdl;
 
 import java.io.IOException;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -112,20 +114,132 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getMessenger()
 				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean onCommand(CommandSender sender, Command command,
+			String label, String[] args) {
+		if (command.getName().equals("wdl")) {
+			if (args.length < 1) {
+				return false;
+			}
+			
+			if (args[0].equalsIgnoreCase("updateme")) {
+				if (args.length != 1) {
+					return false;
+				}
+				
+				if (!(sender instanceof Player)) {
+					sender.sendMessage("§cYou must be a player.");
+					return true;
+				}
+				Player player = (Player)sender;
+				if (!player.getListeningPluginChannels()
+						.contains(CONTROL_CHANNEL_NAME)) {
+					sender.sendMessage("§cYou don't have WDL installed!");
+					sender.sendMessage("§c(not listening on "
+							+ CONTROL_CHANNEL_NAME + ")");
+					return true;
+				}
+				
+				updatePlayer(player);
+				sender.sendMessage("§aUpdated your WDL permissions.");
+				
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("reload")) {
+				if (!sender.hasPermission("wdl.reloadConfig")) {
+					sender.sendMessage("§cYou don't have permission!");
+					return true;
+				}
+				
+				if (args.length != 1) {
+					return false;
+				}
+				
+				reloadConfig();
+				sender.sendMessage("§aWDL configuration reloaded.");
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("update")) {
+				if (!sender.hasPermission("wdl.updatePlayer")) {
+					sender.sendMessage("§cYou don't have permission!");
+					return true;
+				}
+				
+				if (args.length != 2) {
+					return false;
+				}
+				
+				Player player = getServer().getPlayer(args[1]);
+				if (player == null) {
+					sender.sendMessage("§cThere is no player named " + 
+							args[1] + ".");
+					return true;
+				}
+				
+				if (!player.getListeningPluginChannels()
+						.contains(CONTROL_CHANNEL_NAME)) {
+					sender.sendMessage("§c" + player.getDisplayName() + 
+							" doesn't have WDL installed!");
+					sender.sendMessage("§c(not listening on "
+							+ CONTROL_CHANNEL_NAME + ")");
+					return true;
+				}
+				
+				updatePlayer(player);
+				sender.sendMessage("§aUpdated " + player.getDisplayName() +
+						"'s WDL permissions.");
+				
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("updateall")) {
+				if (!sender.hasPermission("wdl.updatePlayer")) {
+					sender.sendMessage("§cYou don't have permission!");
+					return true;
+				}
+				
+				if (args.length != 1) {
+					return false;
+				}
+				
+				int updatedCount = 0;
+				for (Player player : getServer().getOnlinePlayers()) {
+					if (player.getListeningPluginChannels().contains(
+							CONTROL_CHANNEL_NAME)) {
+						updatePlayer(player);
+						updatedCount++;
+					}
+				}
+				
+				sender.sendMessage("§aUpdated the WDL permissions of " + 
+						updatedCount + " players.");
+			}
+		}
+		
+		return false;
+	}
 
+	/**
+	 * Sends a player all of the WDL settings.
+	 */
+	public void updatePlayer(Player player) {
+		byte[][] packets = createWDLPackets(player);
+		
+		for (byte[] packet : packets) {
+			player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
+					packet);
+		}
+	}
+	
 	@Override
 	public void onPluginMessageReceived(String channel, Player player,
 			byte[] data) {
 		if (channel.equals(INIT_CHANNEL_NAME)) {
 			getLogger().info("Player " + player.getName() + 
 					" has WDL enabled.");
-
-			byte[][] packets = createWDLPackets(player);
 			
-			for (byte[] packet : packets) {
-				player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
-						packet);
-			}
+			updatePlayer(player);
 		}
 	}
 
