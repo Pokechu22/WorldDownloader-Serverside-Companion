@@ -45,6 +45,14 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 		
+		//Update all online players.
+		for (Player player : getServer().getOnlinePlayers()) {
+			if (player.getListeningPluginChannels().contains(
+					CONTROL_CHANNEL_NAME)) {
+				updatePlayer(player);
+			}
+		}
+		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
 				public ConfigBooleanPlotter(String key) {
