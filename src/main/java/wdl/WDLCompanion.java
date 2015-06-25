@@ -45,13 +45,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 		
-		//Update all online players.
-		for (Player player : getServer().getOnlinePlayers()) {
-			if (player.getListeningPluginChannels().contains(
-					CONTROL_CHANNEL_NAME)) {
-				updatePlayer(player);
-			}
-		}
+		updateAllPlayers();
 		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
@@ -166,6 +160,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 				
 				reloadConfig();
+				
+				updateAllPlayers();
+				
 				sender.sendMessage("§aWDL configuration reloaded.");
 				return true;
 			}
@@ -211,14 +208,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					return false;
 				}
 				
-				int updatedCount = 0;
-				for (Player player : getServer().getOnlinePlayers()) {
-					if (player.getListeningPluginChannels().contains(
-							CONTROL_CHANNEL_NAME)) {
-						updatePlayer(player);
-						updatedCount++;
-					}
-				}
+				int updatedCount = updateAllPlayers();
 				
 				sender.sendMessage("§aUpdated the WDL permissions of " + 
 						updatedCount + " players.");
@@ -228,6 +218,24 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		return false;
 	}
 
+	/**
+	 * Update all online players.
+	 * 
+	 * @return Number of players updated.
+	 */
+	public int updateAllPlayers() {
+		int updatedCount = 0;
+		for (Player player : getServer().getOnlinePlayers()) {
+			if (player.getListeningPluginChannels().contains(
+					CONTROL_CHANNEL_NAME)) {
+				updatePlayer(player);
+				updatedCount++;
+			}
+		}
+		
+		return updatedCount;
+	}
+	
 	/**
 	 * Sends a player all of the WDL settings.
 	 */
