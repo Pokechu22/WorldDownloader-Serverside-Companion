@@ -50,7 +50,8 @@ permissions:
     description: |
       If a player has this permission, they are allowed to download chunks at
       the full server chunk view distance regardless of what the config value
-      is for "wdl.saveRadius". 
+      is for "wdl.saveRadius".  (Note that this is only used if the player is
+      not allowed to cache chunks!)
   wdl.overrideCanCacheChunks: 
     default: op
     description: |

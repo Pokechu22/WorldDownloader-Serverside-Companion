@@ -15,7 +15,10 @@ wdl:
   
   # The distance from a player that WDL can save chunks.  Use this to limit
   # the area a player can download.  If set to -1, the value for the server
-  # in the server config ("view-distance") is used.
+  # in the server config ("view-distance") is used.  HOWEVER, this does not
+  # apply when a player is allowed to cache chunks.  When the below setting
+  # is set to true, this value is ignored!  (In which case the server value
+  # ("view-distance") is used.)
   saveRadius: -1
   
   # Whether a player can cache chunks as they move.  In essence, this means
