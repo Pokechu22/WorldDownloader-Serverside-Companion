@@ -66,16 +66,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					: "Server view distance");
 
 			Graph canDoNewThingsGraph = metrics
-					.createGraph("Config: canDoNewThings");
+					.createGraph("canDoNewThings");
 			canDoNewThingsGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canDoNewThings"));
 			
 			Graph globalEnabledGraph = metrics
-					.createGraph("Config: canDownloadInGeneral");
+					.createGraph("canDownloadInGeneral");
 			globalEnabledGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canDownloadInGeneral"));
 
-			Graph saveRadiusGraph = metrics.createGraph("Config: saveRadius");
+			Graph saveRadiusGraph = metrics.createGraph("saveRadius");
 			saveRadiusGraph.addPlotter(new Plotter(saveRadiusText) {
 				@Override
 				public int getValue() {
@@ -84,22 +84,22 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			});
 
 			Graph canCacheChunksGraph = metrics
-					.createGraph("Config: canCacheChunks");
+					.createGraph("canCacheChunks");
 			canCacheChunksGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canCacheChunks"));
 
 			Graph canSaveEntitiesGraph = metrics
-					.createGraph("Config: canSaveEntities");
+					.createGraph("canSaveEntities");
 			canSaveEntitiesGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canSaveEntities"));
 
 			Graph canSaveTileEntitiesGraph = metrics
-					.createGraph("Config: canSaveTileEntities");
+					.createGraph("canSaveTileEntities");
 			canSaveTileEntitiesGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canSaveTileEntities"));
 
 			Graph canSaveContainersGraph = metrics
-					.createGraph("Config: canSaveContainers");
+					.createGraph("canSaveContainers");
 			canSaveContainersGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canSaveContainers"));
 
