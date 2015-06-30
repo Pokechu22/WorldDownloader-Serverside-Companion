@@ -48,3 +48,12 @@ wdl:
   # contents, such as chests.  For this setting to be meaningful, the value
   # of "wdl.canSaveTileEntities" must be true.  
   canSaveContainers: true
+  
+  # Whether entity tracking ranges should be sent to the player.  These are
+  # obtained from spigot's settings if spigot is installed.  WDL needs this
+  # data to correctly identify wheter an entity just went out of a player's
+  # range or if it was killed.  If the value is set to false, or the server
+  # doesn't use spigot, WDL uses Minecraft's default values.  (These ranges
+  # are set in spigot.yml.  Look for entity-tracking-range in the per-world
+  # settings.)  If the player cannot save entities, this data is ignored.
+  sendEntityRanges: true

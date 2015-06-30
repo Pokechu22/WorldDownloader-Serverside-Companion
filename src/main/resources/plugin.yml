@@ -82,3 +82,10 @@ permissions:
       entities that require opening to load the contents (containers) such as
       chests, furnaces, hoppers, brewing stands, and beacons, even if such is
       disabled in the config with "wdl.canSaveContainers" set to "false".
+  wdl.overrideSendEntityRanges:
+    default: op
+    description: |
+      If a player has this permission, and the server runs spigot, the ranges
+      at which various entities are tracked will be sent to them.  The config
+      explains why WDL needs this data.  The player must also have permission
+      to save entities (wdl.overrideCanSaveEntities) for this to take effect.

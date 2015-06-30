@@ -1,10 +1,24 @@
 package wdl;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Ambient;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -102,6 +116,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					.createGraph("canSaveContainers");
 			canSaveContainersGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.canSaveContainers"));
+			
+			Graph sendEntityRangesGraph = metrics
+					.createGraph("sendEntityRanges");
+			sendEntityRangesGraph.addPlotter(new ConfigBooleanPlotter(
+					"wdl.sendEntityRanges"));
 
 			metrics.start();
 		} catch (IOException e) {
@@ -303,13 +322,102 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 
 	/**
+	 * Gets the server's entity range settings.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	private Map<String, Integer> getEntityRanges(Player player) {
+		Map<String, Integer> ranges = new HashMap<>();
+		
+		try {
+			int animalRange, monsterRange, miscRange, otherRange;
+			
+			File configFile = new File(getServer().getWorldContainer()
+					.getParentFile(), "spigot.yml");
+			YamlConfiguration config = YamlConfiguration
+					.loadConfiguration(configFile);
+			
+			ConfigurationSection defaults = config
+					.getConfigurationSection("world-settings.default");
+			ConfigurationSection world = config
+					.getConfigurationSection("world-settings."
+							+ player.getWorld().getName());
+			
+			if (world == null) {
+				animalRange = defaults.getInt("entity-tracking-range.animals");
+				monsterRange = defaults.getInt("entity-tracking-range.monsters");
+				miscRange = defaults.getInt("entity-tracking-range.misc");
+				otherRange = defaults.getInt("entity-tracking-range.other");
+			} else {
+				if (world.isInt("entity-tracking-range.animals")) {
+					animalRange = world.getInt("entity-tracking-range.animals");
+				} else {
+					animalRange = defaults.getInt("entity-tracking-range.animals");
+				}
+				if (world.isInt("entity-tracking-range.monsters")) {
+					monsterRange = world.getInt("entity-tracking-range.monsters");
+				} else {
+					monsterRange = defaults.getInt("entity-tracking-range.monsters");
+				}
+				if (world.isInt("entity-tracking-range.misc")) {
+					miscRange = world.getInt("entity-tracking-range.misc");
+				} else {
+					miscRange = defaults.getInt("entity-tracking-range.misc");
+				}
+				if (world.isInt("entity-tracking-range.other")) {
+					otherRange = world.getInt("entity-tracking-range.other");
+				} else {
+					otherRange = defaults.getInt("entity-tracking-range.other");
+				}
+			}
+			
+			for (EntityType type : EntityType.values()) {
+				if (type.getName() == null) {
+					continue;
+				}
+				
+				//Based off of spigot's TrackingRange and ActivationRange.
+				int range;
+				
+				if (Monster.class.isAssignableFrom(type.getEntityClass()) ||
+						Slime.class.isAssignableFrom(type.getEntityClass())) {
+					range = monsterRange;
+				} else if (Creature.class.isAssignableFrom(type.getEntityClass()) ||
+						Ambient.class.isAssignableFrom(type.getEntityClass())) {
+					range = animalRange;
+				} else if (ItemFrame.class.isAssignableFrom(type.getEntityClass()) ||
+						Painting.class.isAssignableFrom(type.getEntityClass()) ||
+						Item.class.isAssignableFrom(type.getEntityClass()) ||
+						ExperienceOrb.class.isAssignableFrom(type.getEntityClass())) {
+					range = miscRange;
+				} else {
+					range = otherRange;
+				}
+				
+				ranges.put(type.getName(), range);
+			}
+			
+			ranges.put("Hologram", otherRange);
+		} catch (Exception e) {
+			//Ignore it; server probably isn't running spigot.
+			System.err.println("Ex in entityRanges: " + e);
+			e.printStackTrace();
+			ranges.clear();
+		}
+		
+		return ranges;
+	}
+	
+	/**
 	 * Creates the byte arrays for all of the WDL packets.
 	 * 
 	 * @param player
 	 * @return
 	 */
 	private byte[][] createWDLPackets(Player player) {
-		byte[][] packets = new byte[2][];
+		byte[][] packets = new byte[3][];
 		
 		//Packet #0
 		boolean canDoNewThings = getConfigValue(player, 
@@ -331,7 +439,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 
 		packets[1] = createWDLPacket1(globalIsEnabled, saveRadius, cacheChunks,
 				saveEntities, saveTileEntities, saveContainers);
-		
+		//Packet #2
+		Map<String, Integer> entityMap = new HashMap<>();
+		if (saveEntities && getConfigValue(player,
+				"wdl.sendEntityRanges", "wdl.overrideSendEntityRanges")) {
+			entityMap.putAll(getEntityRanges(player));
+		}
+		packets[2] = createWDLPacket2(entityMap);
 		
 		return packets;
 	}
@@ -400,6 +514,34 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		output.writeBoolean(saveContainers && saveTileEntities
 				&& globalIsEnabled);
 
+		return output.toByteArray();
+	}
+	
+	/**
+	 * Creates the WDL packet #2.  This packet contains the server's
+	 * tracking ranges for entities.  (If the server doesn't run spigot, or
+	 * the player receives a 0-length list).  WDL uses this data to know when
+	 * an entity leaves the range and thus should be saved.
+	 * <br/>
+	 * Its structure is simply an int, giving the number of entries,
+	 * and then a series of strings and ints containing the tracking
+	 * ranges.  The string value is the entity's savegame name, and the
+	 * int is the tracking range.
+	 * 
+	 * @return
+	 */
+	private byte[] createWDLPacket2(Map<String, Integer> ranges) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(2);
+		
+		output.writeInt(ranges.size());
+		
+		for (Map.Entry<String, Integer> e : ranges.entrySet()) {
+			output.writeUTF(e.getKey());
+			output.writeInt(e.getValue());
+		}
+		
 		return output.toByteArray();
 	}
 }
