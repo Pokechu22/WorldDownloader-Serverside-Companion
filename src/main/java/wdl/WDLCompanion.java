@@ -419,11 +419,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private byte[][] createWDLPackets(Player player) {
 		byte[][] packets = new byte[3][];
 		
-		//Packet #0
-		boolean canDoNewThings = getConfigValue(player, 
-				"wdl.canDoNewThings", "wdl.overrideCanDoNewThings");
-		packets[0] = createWDLPacket0(canDoNewThings);
-		
 		//Packet #1
 		boolean globalIsEnabled = getConfigValue(player,
 				"wdl.canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
@@ -439,9 +434,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 
 		packets[1] = createWDLPacket1(globalIsEnabled, saveRadius, cacheChunks,
 				saveEntities, saveTileEntities, saveContainers);
+		
+		//Packet #0
+		boolean canDoNewThings = getConfigValue(player, 
+				"wdl.canDoNewThings", "wdl.overrideCanDoNewThings");
+		packets[0] = createWDLPacket0(canDoNewThings && globalIsEnabled);
+		
 		//Packet #2
 		Map<String, Integer> entityMap = new HashMap<>();
-		if (saveEntities && getConfigValue(player,
+		if (globalIsEnabled && saveEntities && getConfigValue(player,
 				"wdl.sendEntityRanges", "wdl.overrideSendEntityRanges")) {
 			entityMap.putAll(getEntityRanges(player));
 		}
