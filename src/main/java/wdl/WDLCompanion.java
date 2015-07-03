@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -287,19 +288,48 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @return The download radius applicable to that player.
 	 */
 	private int getSaveRadius(Player player) {
-		final int configDownloadRadius = getConfig().getInt("wdl.saveRadius", -1);
+		if (player.hasPermission("wdl.fullDownloadRadius")) {
+			return -1;
+		}
+		
+		int configDownloadRadius;
+		
+		String worldConfigKey = "wdl.per-world." + 
+				player.getWorld().getName() + ".saveRadius";
+		if (getConfig().isInt(worldConfigKey)) {
+			configDownloadRadius = getConfig().getInt(worldConfigKey);
+		} else {
+			configDownloadRadius = getConfig().getInt("wdl.saveRadius");
+		}
 		
 		if (configDownloadRadius <= -1) {
 			return -1;
 		}
 
-		if (player.hasPermission("wdl.fullDownloadRadius")) {
-			return -1;
-		} else {
-			return configDownloadRadius;
-		}
+		return configDownloadRadius;
 	}
 
+	/**
+	 * Gets a world-specific configuration setting, or the default one if 
+	 * there is none set for the configuration.
+	 * 
+	 * @param world
+	 *            The world to use.
+	 * @param key
+	 *            The config key, which should be in the format of 
+	 *            "canDoNewThings", not "wdl.canDoNewThings".
+	 * @return
+	 */
+	private boolean getWorldConfigValue(World world, String key) {
+		String worldName = world.getName();
+		String worldKey = "wdl.per-world." + worldName + "." + key;
+		if (getConfig().isBoolean(worldKey)) {
+			return getConfig().getBoolean(worldKey);
+		}
+		
+		return getConfig().getBoolean("wdl." + key);
+	}
+	
 	/**
 	 * Gets a value from the config for the given player, unless it is
 	 * overwritten.
@@ -307,9 +337,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @param player
 	 *            The player to check permissions for.
 	 * @param configKey
-	 *            The key in the config to check.
+	 *            The key in the config to check.  It should be in the 
+	 *            format of "canDoNewThings", not "wdl.canDoNewThings". 
 	 * @param overridePerm
-	 *            The permission that overrides the config value.
+	 *            The permission that overrides the config value.  Unlike
+	 *            the configKey, this should be fully qualified, for
+	 *            example "wdl.canDoNewThings".
 	 * @return The value from the config or permissions.
 	 */
 	private boolean getConfigValue(Player player, String configKey,
@@ -317,7 +350,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		if (player.hasPermission(overridePerm)) {
 			return true;
 		} else {
-			return getConfig().getBoolean(configKey);
+			return getWorldConfigValue(player.getWorld(), configKey);
 		}
 	}
 
@@ -421,29 +454,29 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		//Packet #1
 		boolean globalIsEnabled = getConfigValue(player,
-				"wdl.canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
+				"canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
 		int saveRadius = getSaveRadius(player);
-		boolean cacheChunks = getConfigValue(player, "wdl.canCacheChunks",
+		boolean cacheChunks = getConfigValue(player, "canCacheChunks",
 				"wdl.overrideCanCacheChunks");
-		boolean saveEntities = getConfigValue(player, "wdl.canSaveEntities",
+		boolean saveEntities = getConfigValue(player, "canSaveEntities",
 				"wdl.overrideCanSaveEntities");
 		boolean saveTileEntities = getConfigValue(player,
-				"wdl.canSaveTileEntities", "wdl.overrideCanSaveTileEntities");
+				"canSaveTileEntities", "wdl.overrideCanSaveTileEntities");
 		boolean saveContainers = getConfigValue(player,
-				"wdl.canSaveContainers", "wdl.overrideCanSaveContainers");
+				"canSaveContainers", "wdl.overrideCanSaveContainers");
 
 		packets[1] = createWDLPacket1(globalIsEnabled, saveRadius, cacheChunks,
 				saveEntities, saveTileEntities, saveContainers);
 		
 		//Packet #0
 		boolean canDoNewThings = getConfigValue(player, 
-				"wdl.canDoNewThings", "wdl.overrideCanDoNewThings");
+				"canDoNewThings", "wdl.overrideCanDoNewThings");
 		packets[0] = createWDLPacket0(canDoNewThings && globalIsEnabled);
 		
 		//Packet #2
 		Map<String, Integer> entityMap = new HashMap<>();
 		if (globalIsEnabled && saveEntities && getConfigValue(player,
-				"wdl.sendEntityRanges", "wdl.overrideSendEntityRanges")) {
+				"sendEntityRanges", "wdl.overrideSendEntityRanges")) {
 			entityMap.putAll(getEntityRanges(player));
 		}
 		packets[2] = createWDLPacket2(entityMap);
