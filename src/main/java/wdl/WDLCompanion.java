@@ -127,6 +127,10 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		} catch (IOException e) {
 			getLogger().warning("Failed to start PluginMetrics :(");
 		}
+		
+		// Warn about incorrect config setup.
+		// Using the console sender because it supports coloration. 
+		validateConfig(getServer().getConsoleSender());
 	}
 
 	@Override
@@ -180,6 +184,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 				
 				reloadConfig();
+				validateConfig(sender);
 				
 				updateAllPlayers();
 				
@@ -238,6 +243,66 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		return false;
 	}
 
+	/**
+	 * Validates that the configuration is correctly set up, warning 
+	 * if it isn't.
+	 * 
+	 * @param sender The person to complain to if something's wrong.
+	 */
+	private void validateConfig(CommandSender sender) {
+		ConfigurationSection config = getConfig();
+		
+		if (!config.isSet("wdl.canDoNewThings")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.canDoNewThings' is not set!");
+		} else if (!config.isBoolean("wdl.canDoNewThings")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.canDoNewThings' is not a boolean!");
+		}
+		if (!config.isSet("wdl.canDownloadInGeneral")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.canDownloadInGeneral' is not set!");
+		} else if (!config.isBoolean("wdl.canDownloadInGeneral")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.canDownloadInGeneral' is not a boolean!");
+		}
+		if (!config.isSet("wdl.saveRadius")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.saveRadius' is not set!");
+		} else if (!config.isInt("wdl.saveRadius")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.saveRadius' is not an integer!");
+		}
+		if (!config.isSet("wdl.canCacheChunks")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.canCacheChunks' is not set!");
+		} else if (!config.isBoolean("wdl.canCacheChunks")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.canCacheChunks' is not a boolean!");
+		}
+		if (!config.isSet("wdl.canSaveEntities")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.canSaveEntities' is not set!");
+		} else if (!config.isBoolean("wdl.canSaveEntities")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.canSaveEntities' is not a boolean!");
+		}
+		if (!config.isSet("wdl.canSaveContainers")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.canSaveContainers' is not set!");
+		} else if (!config.isBoolean("wdl.canSaveContainers")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.canSaveContainers' is not a boolean!");
+		}
+		if (!config.isSet("wdl.sendEntityRanges")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.sendEntityRanges' is not set!");
+		} else if (!config.isBoolean("wdl.sendEntityRanges")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.sendEntityRanges' is not a boolean!");
+		}
+	}
+	
 	/**
 	 * Update all online players.
 	 * 
