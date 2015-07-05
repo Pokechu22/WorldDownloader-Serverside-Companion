@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -50,6 +51,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * The name of the plugin channel used for WDL control.
 	 */
 	private static final String CONTROL_CHANNEL_NAME = "WDL|CONTROL";
+
+	/**
+	 * Cached entity ranges.
+	 * <br/>
+	 * Key is worldname, value is the map between entity name string and
+	 * track distance.
+	 */
+	private Map<String, Map<String, Integer>> worldEntityRanges 
+			= new HashMap<>();
 
 	@Override
 	public void onEnable() {
@@ -427,6 +437,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 */
 	@SuppressWarnings("deprecation")
 	private Map<String, Integer> getEntityRanges(Player player) {
+		String worldName = player.getWorld().getName();
+		
+		if (worldEntityRanges.containsKey(worldName)) {
+			return worldEntityRanges.get(worldName);
+		}
+		
 		Map<String, Integer> ranges = new HashMap<>();
 		
 		try {
@@ -434,6 +450,18 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			
 			File configFile = new File(getServer().getWorldContainer()
 					.getParentFile(), "spigot.yml");
+			if (!configFile.exists()) {
+				worldEntityRanges.put(worldName, ranges);
+				
+				getLogger().warning("Failed to find entity ranges for world " 
+						+ worldName + ".");
+				getLogger().warning("spigot.yml does not exist.");
+				getLogger().warning("If you're not running spigot, this " 
+						+ "doesn't matter.");
+				
+				return ranges;
+			}
+			
 			YamlConfiguration config = YamlConfiguration
 					.loadConfiguration(configFile);
 			
@@ -499,11 +527,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			
 			ranges.put("Hologram", otherRange);
 		} catch (Exception e) {
-			//Ignore it; server probably isn't running spigot.
-			System.err.println("Ex in entityRanges: " + e);
-			e.printStackTrace();
+			getLogger().log(Level.WARNING, "Failed to find entity ranges for " 
+					+ "world " + worldName + ".", e);
+			
 			ranges.clear();
 		}
+		
+		worldEntityRanges.put(worldName, ranges);
 		
 		return ranges;
 	}
