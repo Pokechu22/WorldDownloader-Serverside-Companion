@@ -26,7 +26,8 @@ wdl:
   # moving about, but if false, the player will only save the nearby chunks
   # when they stop download.  This doesn't really stop a player from saving
   # the entire map (they could still combine the parts if they wanted), but
-  # it will be far harder for a player to do so.
+  # it will be far harder for a player to do so.  IMPORTANT: If this is set
+  # to true, the saveRadius setting is IGNORED!
   canCacheChunks: true
   
   # Whether or not a player can save entities in the map.  This controls if

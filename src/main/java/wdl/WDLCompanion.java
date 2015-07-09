@@ -311,6 +311,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
 					"'wdl.sendEntityRanges' is not a boolean!");
 		}
+		
+		if (config.getInt("wdl.saveRadius") != -1 && 
+				config.getBoolean("wdl.canCacheChunks") == true) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " +
+					"'wdl.saveRadius' is set, but 'wdl.canCacheChunks' " + 
+					"is set to true!");
+			sender.sendMessage("§eWDL ignores the saveRadius value when " +
+					"chunk caching is enabled, due to technical constraints.");
+		}
 	}
 	
 	/**
