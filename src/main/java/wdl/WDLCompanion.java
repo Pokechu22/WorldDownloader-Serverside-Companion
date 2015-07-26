@@ -61,7 +61,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	@Override
 	public void onLoad() {
 		try {
-			LoggingHandler.setupLogging();
+			LoggingHandler.setupLogging(getConfig().getString("wdl.logMode"));
 		} catch (Throwable e) {
 			getLogger().log(Level.WARNING, 
 					"Failed to set up WDL-only logging!", e);
@@ -326,6 +326,27 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					"is set to true!");
 			sender.sendMessage("§eWDL ignores the saveRadius value when " +
 					"chunk caching is enabled, due to technical constraints.");
+		}
+		
+		if (!config.isSet("wdl.logMode")) {
+			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
+					"'wdl.logMode' is not set!");
+		} else if (!config.isString("wdl.logMode")) {
+			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
+					"'wdl.logMode' is not one of the valid options!");
+			sender.sendMessage("§c[WDL] Must be 'none', 'individual', or " +
+					"'combined'!");
+		} else {
+			String logMode = config.getString("wdl.logMode");
+			
+			if (!(logMode.equalsIgnoreCase("none")
+					|| logMode.equalsIgnoreCase("individual") 
+					|| logMode.equalsIgnoreCase("combined"))) {
+				sender.sendMessage("§c[WDL] ERROR: Config setting "
+						+ "'wdl.logMode' is not one of the valid options!");
+				sender.sendMessage("§c[WDL] Must be 'none', 'individual', or " +
+						"'combined'!");
+			}
 		}
 	}
 	

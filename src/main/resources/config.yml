@@ -1,9 +1,17 @@
 # WorldDownloader Serverside Companion configuration file.
 # 
-# There are permissions that override each of these settings, by the name of
-# "wdl.overrideXXX".  They are given to ops by default.
+# There are permissions that override each of these settings, by the name
+# of "wdl.overrideXXX".  They are given to ops by default.
 
-wdl: 
+wdl:
+  # Mode used for WDL-specific logging.  Valid options are 'none' (disables
+  # WDL-specific log files), 'individual' (files dated as vanilla minecraft
+  # does, per server-start and day), and 'combined' (only 1 log file, which
+  # contains all of the data).  Regardless of this setting, the plugin logs
+  # to the global server log.  Plugin-specific logs are found in the server
+  # logs folder, subfolder 'WDL'.
+  logMode: none
+  
   # Whether the client can use features of WDL that are from newer versions
   # than this plugin is aware of (essentially, this provides a default that
   # is used with unrecognized features).
