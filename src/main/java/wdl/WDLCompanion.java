@@ -57,6 +57,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 */
 	private Map<String, Map<String, Integer>> worldEntityRanges 
 			= new HashMap<>();
+	
+	@Override
+	public void onLoad() {
+		try {
+			LoggingHandler.setupLogging();
+		} catch (Throwable e) {
+			getLogger().log(Level.WARNING, 
+					"Failed to set up WDL-only logging!", e);
+		}
+	}
 
 	@Override
 	public void onEnable() {
