@@ -29,6 +29,13 @@ import org.apache.logging.log4j.status.StatusLogger;
 
 /**
  * Class to contain the methods that setup WDL-specific logging.
+ * <br/>
+ * This works by modifying the existing server logger to also log to
+ * a new log file.  It has to take a private field and do some other
+ * silly things, but it's not too weird (at least it's not obfuscated).
+ * <br/>
+ * The log is generated in a subfolder of the server logs folder, named
+ * "WDL".
  */
 public class LoggingHandler {
 	private LoggingHandler() { }
