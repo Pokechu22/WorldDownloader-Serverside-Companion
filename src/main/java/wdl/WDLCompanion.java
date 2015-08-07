@@ -2,10 +2,12 @@ package wdl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -385,7 +387,22 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			byte[] data) {
 		if (channel.equals(INIT_CHANNEL_NAME)) {
 			getLogger().info("Player " + player.getName() + 
-					" has WDL enabled.");
+					" has WDL installed.");
+			Location loc = player.getLocation();
+			getLogger().info(
+					"They are located in world " + player.getWorld().getName()
+							+ ", at " + loc.getX() + ", " + loc.getY() + ", "
+							+ loc.getZ());
+			if (data.length == 0) {
+				getLogger().info("They are running a version of WDL before 1.8d");
+			} else {
+				try {
+					String version = new String(data, "UTF-8");
+					getLogger().info("They are running WDL version " + version);
+				} catch (UnsupportedEncodingException e) {
+					throw new Error(":(", e);
+				}
+			}
 			
 			updatePlayer(player);
 		}
