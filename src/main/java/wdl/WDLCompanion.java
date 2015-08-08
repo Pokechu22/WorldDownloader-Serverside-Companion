@@ -149,7 +149,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		// Warn about incorrect config setup.
 		// Using the console sender because it supports coloration. 
-		validateConfig(getServer().getConsoleSender());
+		ConfigValidation.validateConfig(getConfig(), getServer()
+				.getConsoleSender());
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 				
 				reloadConfig();
-				validateConfig(sender);
+				ConfigValidation.validateConfig(getConfig(), sender);
 				
 				updateAllPlayers();
 				
@@ -262,96 +263,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		return false;
 	}
 
-	/**
-	 * Validates that the configuration is correctly set up, warning 
-	 * if it isn't.
-	 * 
-	 * @param sender The person to complain to if something's wrong.
-	 */
-	private void validateConfig(CommandSender sender) {
-		ConfigurationSection config = getConfig();
-		
-		if (!config.isSet("wdl.canDoNewThings")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canDoNewThings' is not set!");
-		} else if (!config.isBoolean("wdl.canDoNewThings")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canDoNewThings' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canDownloadInGeneral")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canDownloadInGeneral' is not set!");
-		} else if (!config.isBoolean("wdl.canDownloadInGeneral")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canDownloadInGeneral' is not a boolean!");
-		}
-		if (!config.isSet("wdl.saveRadius")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.saveRadius' is not set!");
-		} else if (!config.isInt("wdl.saveRadius")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.saveRadius' is not an integer!");
-		}
-		if (!config.isSet("wdl.canCacheChunks")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canCacheChunks' is not set!");
-		} else if (!config.isBoolean("wdl.canCacheChunks")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canCacheChunks' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canSaveEntities")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canSaveEntities' is not set!");
-		} else if (!config.isBoolean("wdl.canSaveEntities")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canSaveEntities' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canSaveContainers")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canSaveContainers' is not set!");
-		} else if (!config.isBoolean("wdl.canSaveContainers")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canSaveContainers' is not a boolean!");
-		}
-		if (!config.isSet("wdl.sendEntityRanges")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.sendEntityRanges' is not set!");
-		} else if (!config.isBoolean("wdl.sendEntityRanges")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.sendEntityRanges' is not a boolean!");
-		}
-		
-		if (config.getInt("wdl.saveRadius") != -1 && 
-				config.getBoolean("wdl.canCacheChunks") == true) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " +
-					"'wdl.saveRadius' is set, but 'wdl.canCacheChunks' " + 
-					"is set to true!");
-			sender.sendMessage("§eWDL ignores the saveRadius value when " +
-					"chunk caching is enabled, due to technical constraints.");
-		}
-		
-		if (!config.isSet("wdl.logMode")) {
-			sender.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.logMode' is not set!");
-		} else if (!config.isString("wdl.logMode")) {
-			sender.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.logMode' is not one of the valid options!");
-			sender.sendMessage("§c[WDL] Must be 'none', 'individual', or " +
-					"'combined'!");
-		} else {
-			String logMode = config.getString("wdl.logMode");
-			
-			if (!(logMode.equalsIgnoreCase("none")
-					|| logMode.equalsIgnoreCase("individual") 
-					|| logMode.equalsIgnoreCase("combined"))) {
-				sender.sendMessage("§c[WDL] ERROR: Config setting "
-						+ "'wdl.logMode' is not one of the valid options!");
-				sender.sendMessage("§c[WDL] Must be 'none', 'individual', or " +
-						"'combined'!");
-			}
-		}
-	}
-	
 	/**
 	 * Update all online players.
 	 * 
