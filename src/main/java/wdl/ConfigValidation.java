@@ -1,60 +1,21 @@
 package wdl;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class ConfigValidation {
-	public static void validateConfig(ConfigurationSection config,
+	public static void validateConfig(Configuration config,
 			CommandSender warnTo) {
-		if (!config.isSet("wdl.canDoNewThings")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canDoNewThings' is not set!");
-		} else if (!config.isBoolean("wdl.canDoNewThings")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canDoNewThings' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canDownloadInGeneral")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canDownloadInGeneral' is not set!");
-		} else if (!config.isBoolean("wdl.canDownloadInGeneral")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canDownloadInGeneral' is not a boolean!");
-		}
-		if (!config.isSet("wdl.saveRadius")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.saveRadius' is not set!");
-		} else if (!config.isInt("wdl.saveRadius")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.saveRadius' is not an integer!");
-		}
-		if (!config.isSet("wdl.canCacheChunks")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canCacheChunks' is not set!");
-		} else if (!config.isBoolean("wdl.canCacheChunks")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canCacheChunks' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canSaveEntities")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canSaveEntities' is not set!");
-		} else if (!config.isBoolean("wdl.canSaveEntities")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canSaveEntities' is not a boolean!");
-		}
-		if (!config.isSet("wdl.canSaveContainers")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.canSaveContainers' is not set!");
-		} else if (!config.isBoolean("wdl.canSaveContainers")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.canSaveContainers' is not a boolean!");
-		}
-		if (!config.isSet("wdl.sendEntityRanges")) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.sendEntityRanges' is not set!");
-		} else if (!config.isBoolean("wdl.sendEntityRanges")) {
-			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
-					"'wdl.sendEntityRanges' is not a boolean!");
-		}
+		ConfigurationSection section = config.getConfigurationSection("wdl");
+		
+		validateIsBool("canDoNewThings", section, warnTo);
+		validateIsBool("canDownloadInGeneral", section, warnTo);
+		validateIsInt("saveRadius", section, warnTo);
+		validateIsBool("canCacheChunks", section, warnTo);
+		validateIsBool("canSaveEntities", section, warnTo);
+		validateIsBool("canSaveContainers", section, warnTo);
+		validateIsBool("sendEntityRanges", section, warnTo);
 		
 		if (config.getInt("wdl.saveRadius") != -1 && 
 				config.getBoolean("wdl.canCacheChunks") == true) {
@@ -84,6 +45,54 @@ public class ConfigValidation {
 				warnTo.sendMessage("§c[WDL] Must be 'none', 'individual', or " +
 						"'combined'!");
 			}
+		}
+	}
+	
+	/**
+	 * Validates that the given key is set and is a boolean, warning the
+	 * player if not.
+	 * 
+	 * @param key The key within the given section.
+	 * @param config The section of the config to check.
+	 * @param warnTo The player to complain to if something is wrong.
+	 */
+	private static void validateIsBool(String key, ConfigurationSection config, 
+			CommandSender warnTo) {
+		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
+				.getCurrentPath() + "." + key);
+		
+		if (!config.isSet(key)) {
+			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
+					fullKey + "' is not set!  The default value of " +
+					config.get(key) + " will be used instead!");
+		} else if (!config.isBoolean(key)) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
+					fullKey + " is not a boolean!  The default value of " +
+					config.get(key) + " will be used instead!");
+		}
+	}
+	
+	/**
+	 * Validates that the given key is set and is an int, warning the 
+	 * player if not.
+	 * 
+	 * @param key The key within the given section.
+	 * @param config The section of the config to check.
+	 * @param warnTo The player to complain to if something is wrong.
+	 */
+	private static void validateIsInt(String key, ConfigurationSection config, 
+			CommandSender warnTo) {
+		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
+				.getCurrentPath() + "." + key);
+		
+		if (!config.isSet(key)) {
+			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
+					fullKey + "' is not set!  The default value of " +
+					config.get(key) + " will be used instead!");
+		} else if (!config.isInt(key)) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
+					fullKey + " is not an integer!  The default value of " +
+					config.get(key) + " will be used instead!");
 		}
 	}
 }
