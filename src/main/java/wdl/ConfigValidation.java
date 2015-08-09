@@ -28,7 +28,8 @@ public class ConfigValidation {
 		
 		if (!config.isSet("wdl.logMode")) {
 			warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-					"'wdl.logMode' is not set!");
+					"'wdl.logMode' is not set!  The default value of " + 
+					config.get("wdl.logMode") + " will be used instead!");
 		} else if (!config.isString("wdl.logMode")) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					"'wdl.logMode' is not one of the valid options!");
