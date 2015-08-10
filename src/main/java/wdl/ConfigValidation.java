@@ -131,11 +131,11 @@ public class ConfigValidation {
 		if (!config.isSet(key)) {
 			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
 					fullKey + "' is not set!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getBoolean(key) + " will be used instead!");
 		} else if (!config.isBoolean(key)) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not a boolean!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getBoolean(key) + " will be used instead!");
 		}
 	}
 	
@@ -155,11 +155,11 @@ public class ConfigValidation {
 		if (!config.isSet(key)) {
 			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
 					fullKey + "' is not set!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getInt(key) + " will be used instead!");
 		} else if (!config.isInt(key)) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not an integer!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getInt(key) + " will be used instead!");
 		}
 	}
 	
@@ -176,14 +176,10 @@ public class ConfigValidation {
 		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
 				.getCurrentPath() + "." + key);
 		
-		if (!config.isSet(key)) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
-					fullKey + "' is not set!  The default value of " +
-					config.get(key) + " will be used instead!");
-		} else if (!config.isBoolean(key)) {
+		if (config.isSet(key) && !config.isBoolean(key)) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not a boolean!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getBoolean(key) + " will be used instead!");
 		}
 	}
 	
@@ -200,14 +196,10 @@ public class ConfigValidation {
 		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
 				.getCurrentPath() + "." + key);
 		
-		if (!config.isSet(key)) {
-			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
-					fullKey + "' is not set!  The default value of " +
-					config.get(key) + " will be used instead!");
-		} else if (!config.isInt(key)) {
+		if (config.isSet(key) && !config.isBoolean(key)) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not an integer!  The default value of " +
-					config.get(key) + " will be used instead!");
+					config.getInt(key) + " will be used instead!");
 		}
 	}
 }
