@@ -71,5 +71,7 @@ wdl:
   # world configuration, it uses the default values above.  World names are
   # based off of the folder name.
   per-world: 
-    someMinigameWorld: 
-      canDownloadInGeneral: false
+  # Example is below.
+  #
+  #  someMinigameWorld: 
+  #    canDownloadInGeneral: false
