@@ -1,5 +1,8 @@
 package wdl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -8,6 +11,24 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class ConfigValidation {
+	/**
+	 * Options that are valid for per-world config sections.
+	 */
+	private static final List<String> worldConfigOptions = Arrays.asList(
+			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
+			"canCacheChunks", "canSaveEntities", "canSaveContainers",
+			"sendEntityRanges");
+	/**
+	 * Options that are valid for the main config.
+	 */
+	private static final List<String> generalConfigOptions = Arrays.asList(
+			//Per-world and main config
+			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
+			"canCacheChunks", "canSaveEntities", "canSaveContainers",
+			"sendEntityRanges",
+			//Main-config specific
+			"logMode", "per-world");
+	
 	/**
 	 * Validates the entire configuration.
 	 * 
@@ -80,6 +101,17 @@ public class ConfigValidation {
 				validateWorldSection(world, config, warnTo);
 			}
 		}
+		
+		List<String> keys = new ArrayList<>(section.getKeys(false));
+		keys.removeAll(generalConfigOptions);
+		if (!keys.isEmpty()) {
+			warnTo.sendMessage("§c[WDL] WARNING: There are config settings " +
+					"that are not recognised!  They are:");
+			for (String key : keys) {
+				warnTo.sendMessage("§c[WDL]   * " + section.getCurrentPath()
+						+ "." + key);
+			}
+		}
 	}
 	
 	/**
@@ -113,6 +145,17 @@ public class ConfigValidation {
 		validateIsBoolOrUnset("canSaveEntities", section, warnTo);
 		validateIsBoolOrUnset("canSaveContainers", section, warnTo);
 		validateIsBoolOrUnset("sendEntityRanges", section, warnTo);
+		
+		List<String> keys = new ArrayList<>(section.getKeys(false));
+		keys.removeAll(worldConfigOptions);
+		if (!keys.isEmpty()) {
+			warnTo.sendMessage("§c[WDL] WARNING: There are config settings " +
+					"that are not recongised!  They are:");
+			for (String key : keys) {
+				warnTo.sendMessage("§c[WDL]   * " + section.getCurrentPath()
+						+ "." + key);
+			}
+		}
 	}
 	
 	/**
