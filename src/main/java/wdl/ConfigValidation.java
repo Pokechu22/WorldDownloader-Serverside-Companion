@@ -16,16 +16,16 @@ public class ConfigValidation {
 	 */
 	private static final List<String> worldConfigOptions = Arrays.asList(
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
-			"canCacheChunks", "canSaveEntities", "canSaveContainers",
-			"sendEntityRanges");
+			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
+			"canSaveContainers", "sendEntityRanges");
 	/**
 	 * Options that are valid for the main config.
 	 */
 	private static final List<String> generalConfigOptions = Arrays.asList(
 			//Per-world and main config
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
-			"canCacheChunks", "canSaveEntities", "canSaveContainers",
-			"sendEntityRanges",
+			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
+			"canSaveContainers", "sendEntityRanges",
 			//Main-config specific
 			"logMode", "per-world");
 	
@@ -44,6 +44,7 @@ public class ConfigValidation {
 		validateIsInt("saveRadius", section, warnTo);
 		validateIsBool("canCacheChunks", section, warnTo);
 		validateIsBool("canSaveEntities", section, warnTo);
+		validateIsBool("canSaveTileEntities", section, warnTo);
 		validateIsBool("canSaveContainers", section, warnTo);
 		validateIsBool("sendEntityRanges", section, warnTo);
 		
@@ -143,6 +144,7 @@ public class ConfigValidation {
 		validateIsIntOrUnset("saveRadius", section, warnTo);
 		validateIsBoolOrUnset("canCacheChunks", section, warnTo);
 		validateIsBoolOrUnset("canSaveEntities", section, warnTo);
+		validateIsBoolOrUnset("canSaveTileEntities", section, warnTo);
 		validateIsBoolOrUnset("canSaveContainers", section, warnTo);
 		validateIsBoolOrUnset("sendEntityRanges", section, warnTo);
 		
