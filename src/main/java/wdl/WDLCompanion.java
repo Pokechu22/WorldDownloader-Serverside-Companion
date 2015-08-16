@@ -303,13 +303,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			getLogger().info(
 					"They are located in world " + player.getWorld().getName()
 							+ ", at " + loc.getX() + ", " + loc.getY() + ", "
-							+ loc.getZ());
+							+ loc.getZ() + ".");
 			if (data.length == 0) {
-				getLogger().info("They are running a version of WDL before 1.8d");
+				getLogger().info(
+						"They are running a version of WDL before 1.8d.");
 			} else {
 				try {
 					String version = new String(data, "UTF-8");
-					getLogger().info("They are running WDL version " + version);
+					getLogger().info(
+							"They are running WDL version " + version + ".");
 				} catch (UnsupportedEncodingException e) {
 					throw new Error(":(", e);
 				}
