@@ -83,8 +83,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
+				private final String key;
 				public ConfigBooleanPlotter(String key) {
 					super(getConfig().getBoolean(key) ? "true" : "false");
+					
+					this.key = key;
+				}
+				
+				@Override
+				public String getColumnName() {
+					return getConfig().getBoolean(key) ? "true" : "false";
 				}
 
 				@Override
@@ -114,6 +122,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				@Override
 				public int getValue() {
 					return 1;
+				}
+				
+				@Override
+				public String getColumnName() {
+					int saveRadius = getConfig().getInt("wdl.saveRadius", -1);
+					String saveRadiusText = (saveRadius >= 0 ? (saveRadius + " chunks")
+							: "Server view distance");
+
+					return saveRadiusText;
 				}
 			});
 
