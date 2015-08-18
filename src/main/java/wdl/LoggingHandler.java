@@ -151,6 +151,10 @@ public class LoggingHandler {
 "player wouldn't have been able to download on the server (unless the plugin",
 "is configured to allow it, or they were manually exempted).", 
 "",
+"Some further information: 'WDL|INIT' is sent whenever the player has joined",
+"the server, whenever they change worlds on the server (including going from",
+"and to the nether and the end), and when the saving of a world is finished.",
+"",
 "If you want to disable this log, please set logType to 'none' in the plugin",
 "config file.  The actual log begins below.",
 ""
