@@ -10,7 +10,7 @@ wdl:
   # contains all of the data).  Regardless of this setting, the plugin logs
   # to the global server log.  Plugin-specific logs are found in the server
   # logs folder, subfolder 'WDL'.
-  logMode: none
+  logMode: individual
   
   # Whether the client can use features of WDL that are from newer versions
   # than this plugin is aware of (essentially, this provides a default that
