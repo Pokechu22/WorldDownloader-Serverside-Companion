@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -69,7 +70,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					"Failed to set up WDL-only logging!", e);
 		}
 	}
-
+	
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
@@ -158,6 +159,36 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					.createGraph("sendEntityRanges");
 			sendEntityRangesGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.sendEntityRanges"));
+
+			Graph usingPlayers = metrics.createGraph("usingPlayers");
+			usingPlayers.addPlotter(new Plotter("Does not have WDL installed") {
+				@Override
+				public int getValue() {
+					int nonRunning = 0;
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (!player.getListeningPluginChannels().contains(
+								INIT_CHANNEL_NAME)) {
+							nonRunning++;
+						}
+					}
+
+					return nonRunning;
+				}
+			});
+			usingPlayers.addPlotter(new Plotter("Has WDL installed") {
+				@Override
+				public int getValue() {
+					int running = 0;
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.getListeningPluginChannels().contains(
+								INIT_CHANNEL_NAME)) {
+							running++;
+						}
+					}
+
+					return running;
+				}
+			});
 
 			metrics.start();
 		} catch (IOException e) {
