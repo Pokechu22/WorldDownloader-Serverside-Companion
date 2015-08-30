@@ -61,6 +61,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private Map<String, Map<String, Integer>> worldEntityRanges 
 			= new HashMap<>();
 	
+	private BookCreator bookCreator;
+	
 	@Override
 	public void onLoad() {
 		try {
@@ -79,6 +81,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME, this);
 		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
+		
+		this.bookCreator = new BookCreator(this);
 		
 		updateAllPlayers();
 		
@@ -305,6 +309,10 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				
 				sender.sendMessage("§aUpdated the WDL permissions of " + 
 						updatedCount + " players.");
+			}
+			
+			if (args[0].equals("bot")) {
+				bookCreator.openBook((Player)sender, "TEST", args);
 			}
 		}
 		
