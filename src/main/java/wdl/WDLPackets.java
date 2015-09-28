@@ -102,4 +102,25 @@ public class WDLPackets {
 		return output.toByteArray();
 	}
 
+	/**
+	 * Creates the WDL packet #3.
+	 * 
+	 * This packet gives information to display when requesting permissions.
+	 * 
+	 * The structure is a boolean (which controls whether requests are enabled,
+	 * but <b>will always be true</b>), followed by a UTF-string to display
+	 * to the player.
+	 * 
+	 * @return
+	 */
+	public static byte[] createWDLPacket3(String message) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(3);
+		
+		output.writeBoolean(true);
+		output.writeUTF(message);
+		
+		return output.toByteArray();
+	}
 }

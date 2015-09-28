@@ -429,6 +429,27 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 	
 	/**
+	 * Gets a world-specific configuration setting, or the default one if 
+	 * there is none set for the configuration.
+	 * 
+	 * @param world
+	 *            The world to use.
+	 * @param key
+	 *            The config key, which should be in the format of 
+	 *            "canDoNewThings", not "wdl.canDoNewThings".
+	 * @return
+	 */
+	private String getWorldStringConfigValue(World world, String key) {
+		String worldName = world.getName();
+		String worldKey = "wdl.per-world." + worldName + "." + key;
+		if (getConfig().isString(worldKey)) {
+			return getConfig().getString(worldKey);
+		}
+		
+		return getConfig().getString("wdl." + key);
+	}
+	
+	/**
 	 * Gets a value from the config for the given player, unless it is
 	 * overwritten.
 	 * 
@@ -568,7 +589,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @return
 	 */
 	private byte[][] createWDLPackets(Player player) {
-		byte[][] packets = new byte[3][];
+		byte[][] packets = new byte[4][];
 		
 		//Packet #1
 		boolean globalIsEnabled = getConfigValue(player,
@@ -598,6 +619,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			entityMap.putAll(getEntityRanges(player));
 		}
 		packets[2] = WDLPackets.createWDLPacket2(entityMap);
+		
+		//Packet #3
+		String requestMessage = getWorldStringConfigValue(player.getWorld(),
+				"requestMessage");
+		packets[3] = WDLPackets.createWDLPacket3(requestMessage);
 		
 		return packets;
 	}

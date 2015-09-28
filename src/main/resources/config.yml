@@ -67,6 +67,14 @@ wdl:
   # settings.)  If the player cannot save entities, this data is ignored.
   sendEntityRanges: true
 
+  # A message to show the player when they requesting permissions.  This is
+  # only used in versions of WDL after 1.8d.  This can be used to state any
+  # rules regarding requests.  If this message is blank (or unset), nothing
+  # will be displayed, although the player will still be able make requests
+  # normally.  If the player can already download, this should generally be
+  # left unset, as it will create clutter.
+  requestMessage: ""
+
   # Per-world configuration goes here.  If a value isn't specified in world
   # world configuration, it uses the default values above.  World names are
   # based off of the folder name.

@@ -47,6 +47,7 @@ public class ConfigValidation {
 		validateIsBool("canSaveTileEntities", section, warnTo);
 		validateIsBool("canSaveContainers", section, warnTo);
 		validateIsBool("sendEntityRanges", section, warnTo);
+		validateIsString("requestMessage", section, warnTo);
 		
 		if (config.getInt("wdl.saveRadius") != -1 && 
 				config.getBoolean("wdl.canCacheChunks") == true) {
@@ -147,6 +148,7 @@ public class ConfigValidation {
 		validateIsBoolOrUnset("canSaveTileEntities", section, warnTo);
 		validateIsBoolOrUnset("canSaveContainers", section, warnTo);
 		validateIsBoolOrUnset("sendEntityRanges", section, warnTo);
+		validateIsStringOrUnset("requestMessage", section, warnTo);
 		
 		List<String> keys = new ArrayList<>(section.getKeys(false));
 		keys.removeAll(worldConfigOptions);
@@ -209,6 +211,30 @@ public class ConfigValidation {
 	}
 	
 	/**
+	 * Validates that the given key is set and is a String, warning the 
+	 * player if not.
+	 * 
+	 * @param key The key within the given section.
+	 * @param config The section of the config to check.
+	 * @param warnTo The player to complain to if something is wrong.
+	 */
+	private static void validateIsString(String key, ConfigurationSection config, 
+			CommandSender warnTo) {
+		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
+				.getCurrentPath() + "." + key);
+		
+		if (!config.isSet(key)) {
+			warnTo.sendMessage("§e[WDL] WARNING: Config setting '" + 
+					fullKey + "' is not set!  The default value of \"" +
+					config.getString(key) + "\" will be used instead!");
+		} else if (!config.isString(key)) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
+					fullKey + " is not a string!  The default value of \"" +
+					config.getString(key) + "\" will be used instead!");
+		}
+	}
+	
+	/**
 	 * Validates that the given key is a boolean or is unset, warning the
 	 * player if not.
 	 * 
@@ -245,6 +271,26 @@ public class ConfigValidation {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not an integer!  The default value of " +
 					config.getInt(key) + " will be used instead!");
+		}
+	}
+	
+	/**
+	 * Validates that the given key is a String or is unset, warning the 
+	 * player if not.
+	 * 
+	 * @param key The key within the given section.
+	 * @param config The section of the config to check.
+	 * @param warnTo The player to complain to if something is wrong.
+	 */
+	private static void validateIsStringOrUnset(String key,
+			ConfigurationSection config, CommandSender warnTo) {
+		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
+				.getCurrentPath() + "." + key);
+		
+		if (config.isSet(key) && !config.isString(key)) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
+					fullKey + " is not an integer!  The default value of " +
+					config.getString(key) + " will be used instead!");
 		}
 	}
 }
