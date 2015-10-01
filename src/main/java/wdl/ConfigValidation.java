@@ -17,7 +17,7 @@ public class ConfigValidation {
 	private static final List<String> worldConfigOptions = Arrays.asList(
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
-			"canSaveContainers", "sendEntityRanges");
+			"canSaveContainers", "sendEntityRanges", "requestMessage");
 	/**
 	 * Options that are valid for the main config.
 	 */
@@ -25,7 +25,7 @@ public class ConfigValidation {
 			//Per-world and main config
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
-			"canSaveContainers", "sendEntityRanges",
+			"canSaveContainers", "sendEntityRanges", "requestMessage",
 			//Main-config specific
 			"logMode", "per-world");
 	
