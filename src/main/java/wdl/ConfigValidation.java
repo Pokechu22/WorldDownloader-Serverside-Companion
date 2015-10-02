@@ -49,6 +49,8 @@ public class ConfigValidation {
 		validateIsBool("sendEntityRanges", section, warnTo);
 		validateIsString("requestMessage", section, warnTo);
 		
+		validateStringLength("requestMessage", section, 15000, warnTo);
+		
 		if (config.getInt("wdl.saveRadius") != -1 && 
 				config.getBoolean("wdl.canCacheChunks") == true) {
 			warnTo.sendMessage("§e[WDL] WARNING: Config setting " +
@@ -149,6 +151,8 @@ public class ConfigValidation {
 		validateIsBoolOrUnset("canSaveContainers", section, warnTo);
 		validateIsBoolOrUnset("sendEntityRanges", section, warnTo);
 		validateIsStringOrUnset("requestMessage", section, warnTo);
+		
+		validateStringLength("requestMessage", section, 15000, warnTo);
 		
 		List<String> keys = new ArrayList<>(section.getKeys(false));
 		keys.removeAll(worldConfigOptions);
@@ -291,6 +295,30 @@ public class ConfigValidation {
 			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + 
 					fullKey + " is not an integer!  The default value of " +
 					config.getString(key) + " will be used instead!");
+		}
+	}
+	
+	/**
+	 * Validates that the given key is a string with a length shorter
+	 * than the given length.
+	 * 
+	 * @param key The key within the given section.
+	 * @param config The section of the config to check.
+	 * @param maxLength The maximum length for the string.
+	 * @param warnTo The player to complain to if something is wrong.
+	 */
+	private static void validateStringLength(String key,
+			ConfigurationSection config, int maxLength, CommandSender warnTo) {
+		String fullKey = (config.getCurrentPath().isEmpty() ? key : config
+				.getCurrentPath() + "." + key);
+
+		//Don't check that it's set specifically -- that will be handled
+		//elsewhere.
+		if (config.get(key) != null
+				&& config.getString(key).length() >= maxLength) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting " + fullKey
+					+ " is too long!  It must be shorter than " + maxLength
+					+ " characters!");
 		}
 	}
 }
