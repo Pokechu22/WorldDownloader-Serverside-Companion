@@ -123,4 +123,39 @@ public class WDLPackets {
 		
 		return output.toByteArray();
 	}
+	
+	/**
+	 * Creates the WDL packet #4.
+	 * 
+	 * This packet specifies overrides for what chunks can and cannot be saved.
+	 *
+	 * This packet starts with a single boolean that states whether the old
+	 * list of locations should be cleared or appended.  If true, append to
+	 * the list.
+	 * 
+	 * It is followed by an int, stating the number of areas, and then a series
+	 * of 1 boolean + 4 ints, the boolean being whether it is whitelisting 
+	 * (true) or blacklisting (false) and the ints specifying the coordinates. 
+	 * 
+	 * @return
+	 */
+	public static byte[] createWDLPacket4(ProtectionRange... ranges) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(4);
+		
+		output.writeBoolean(true); //Override old data.  For now, always true.
+		
+		output.writeInt(ranges.length);
+		
+		for (ProtectionRange range : ranges) {
+			output.writeBoolean(range.isWhitelist);
+			output.writeInt(range.x1);
+			output.writeInt(range.y1);
+			output.writeInt(range.x2);
+			output.writeInt(range.y2);
+		}
+		
+		return output.toByteArray();
+	}
 }
