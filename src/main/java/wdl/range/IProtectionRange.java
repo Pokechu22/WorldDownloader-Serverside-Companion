@@ -1,11 +1,18 @@
 package wdl.range;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+
 /**
  * Base interface for any protection range.
  * <br/>
  * Used to either explicitly <b>blacklist</b> / disable saving of
  * or <b>whitelist</b> allow saving of the chunk, even if saving is
  * normally disabled.
+ * <br/>
+ * Additionally, implementors will need a constructor taking a
+ * ConfigurationSection.  This constructor may throw a
+ * {@link InvalidConfigurationException} if the configuration is
+ * not acceptable.
  */
 public interface IProtectionRange {
 	/**
