@@ -2,7 +2,7 @@ package wdl;
 
 import java.util.Map;
 
-import wdl.range.IProtectionRange;
+import wdl.range.ChunkRange;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -141,7 +141,7 @@ public class WDLPackets {
 	 * 
 	 * @return
 	 */
-	public static byte[] createWDLPacket4(IProtectionRange... ranges) {
+	public static byte[] createWDLPacket4(ChunkRange... ranges) {
 		ByteArrayDataOutput output = ByteStreams.newDataOutput();
 		
 		output.writeInt(4);
@@ -150,20 +150,18 @@ public class WDLPackets {
 		
 		output.writeInt(ranges.length);
 		
-		for (IProtectionRange range : ranges) {
-			output.writeBoolean(range.isWhitelist());
-			int x1 = range.getChunkX1(), y1 = range.getChunkY1();
-			int x2 = range.getChunkX2(), y2 = range.getChunkY2();
+		for (ChunkRange range : ranges) {
+			output.writeBoolean(range.isWhitelist);
+			int x1 = range.x1, y1 = range.y1;
+			int x2 = range.x2, y2 = range.y2;
 			
-			if (x2 > x1) {
-				int temp = x2;
-				x2 = x1;
-				x1 = temp;
+			if (x1 > x2) {
+				x2 = range.x1;
+				x1 = range.x2;
 			}
-			if (y2 > y1) {
-				int temp = y2;
-				y2 = y1;
-				y1 = temp;
+			if (y1 > y2) {
+				y2 = range.y1;
+				y1 = range.y2;
 			}
 			
 			output.writeInt(x1);
