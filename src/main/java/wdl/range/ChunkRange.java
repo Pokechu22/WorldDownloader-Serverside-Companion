@@ -5,12 +5,12 @@ package wdl.range;
  * swapped, and if y1 is greater than y2, they will be swapped.
  */
 public final class ChunkRange {
-	public ChunkRange(int x1, int y1, int x2, int y2, boolean allow) {
+	public ChunkRange(int x1, int y1, int x2, int y2, boolean isWhitelist) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
 		this.y2 = y2;
-		this.isWhitelist = allow;
+		this.isWhitelist = isWhitelist;
 	}
 	
 	/**
