@@ -19,8 +19,7 @@ public class ConfigValidation {
 	private static final List<String> worldConfigOptions = Arrays.asList(
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
-			"canSaveContainers", "sendEntityRanges", "requestMessage",
-			"chunkOverrides");
+			"canSaveContainers", "sendEntityRanges", "requestMessage");
 	/**
 	 * Options that are valid for the main config.
 	 */
@@ -29,9 +28,8 @@ public class ConfigValidation {
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
 			"canSaveContainers", "sendEntityRanges", "requestMessage",
-			"chunkOverrides",
 			//Main-config specific
-			"logMode", "per-world");
+			"logMode", "per-world", "chunkOverrides");
 	
 	/**
 	 * Validates the entire configuration.
@@ -132,6 +130,10 @@ public class ConfigValidation {
 					if (!validateChunkOverride(chunkOverride, key, warnTo, plugin)) {
 						toRemove.add(key);
 					}
+				}
+				
+				for (String key : toRemove) {
+					chunkOverrides.set(key, null);
 				}
 			}
 		}
