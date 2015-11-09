@@ -75,9 +75,23 @@ wdl:
   # left unset, as it will create clutter.
   requestMessage: ""
 
+  # Overrides for specific chunks can be created here.  In these overrides,
+  # the value of 'whitelist' controls the behavior.  If it is set to false,
+  # no downloading may occur within that chunk, even if it would usually be
+  # allowed based off of the other settings.  Similarly, if it is true, all
+  # downloading may occur, even if the other settings are disabled.
+  # 
+  # The structure is a mapping.  The key of the mapping is, in general, not
+  # used (the only purpose is to help with debug output).  Inside, the type
+  # value is used to control what the behavior is.  The current options are
+  # 'ChunkRange' and 'BlockRange'.  For both of these, the whitelist option
+  # controls whitelisting, and then there are coordinates.  For ChunkRange,
+  # these are chunk coordinates (found in F3), while BlockRange uses single
+  # block coordinates.
   chunkOverrides:
   #Example below:
-  #  type: ChunkRange
+  #  example1:
+  #    type: ChunkRange
   #    whitelist: true
   #    x1: 5
   #    y1: 7
