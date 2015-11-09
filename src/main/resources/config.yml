@@ -75,6 +75,32 @@ wdl:
   # left unset, as it will create clutter.
   requestMessage: ""
 
+  chunkOverrides:
+  #Example below:
+    example1:
+      type: ChunkRange
+      x1: 5
+      y1: 7
+      x2: 200
+      y2: 126
+    example2:
+      type: BlockRange
+      x1: 100
+      y1: 4
+      x2: 10
+      y2: 126
+    example3:
+      type: asdf
+      x1: 9
+      y1: 4
+      x2: 10
+      y2: 126
+    example4:
+      x1: 9
+      y1: 4
+      x2: 10
+      y2: 126
+
   # Per-world configuration goes here.  If a value isn't specified in world
   # world configuration, it uses the default values above.  World names are
   # based off of the folder name.

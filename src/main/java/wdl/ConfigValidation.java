@@ -10,6 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
+import wdl.range.IRangeProducer;
+
 public class ConfigValidation {
 	/**
 	 * Options that are valid for per-world config sections.
@@ -17,7 +19,8 @@ public class ConfigValidation {
 	private static final List<String> worldConfigOptions = Arrays.asList(
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
-			"canSaveContainers", "sendEntityRanges", "requestMessage");
+			"canSaveContainers", "sendEntityRanges", "requestMessage",
+			"chunkOverrides");
 	/**
 	 * Options that are valid for the main config.
 	 */
@@ -26,6 +29,7 @@ public class ConfigValidation {
 			"canDoNewThings", "canDownloadInGeneral", "saveRadius",
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
 			"canSaveContainers", "sendEntityRanges", "requestMessage",
+			"chunkOverrides",
 			//Main-config specific
 			"logMode", "per-world");
 	
@@ -34,9 +38,10 @@ public class ConfigValidation {
 	 * 
 	 * @param config The root configuration.
 	 * @param warnTo The player to complain at if there's something wrong.
+	 * @param plugin The instance of the plugin.
 	 */
 	public static void validateConfig(Configuration config,
-			CommandSender warnTo) {
+			CommandSender warnTo, WDLCompanion plugin) {
 		ConfigurationSection section = config.getConfigurationSection("wdl");
 		
 		validateIsBool("canDoNewThings", section, warnTo);
@@ -88,21 +93,46 @@ public class ConfigValidation {
 				warnTo.sendMessage("§c[WDL] ERROR: Per-world configs (wdl." + 
 						"per-world) is not a mapping!  Per-world configs " +
 						"will not be used!");
-				return;
-			}
-			
-			ConfigurationSection perWorld = section
-					.getConfigurationSection("per-world");
-			Set<String> worlds = perWorld.getKeys(false);
-			
-			for (String world : worlds) {
-				if (Bukkit.getWorld(world) == null) {
-					warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
-							"wdl.per-world." + world + " corresponds with " +
-							"a world that does not exist!");
-				}
+			} else {
+				ConfigurationSection perWorld = section
+						.getConfigurationSection("per-world");
+				Set<String> worlds = perWorld.getKeys(false);
 				
-				validateWorldSection(world, config, warnTo);
+				for (String world : worlds) {
+					if (Bukkit.getWorld(world) == null) {
+						warnTo.sendMessage("§e[WDL] WARNING: Config setting " + 
+								"wdl.per-world." + world + " corresponds with " +
+								"a world that does not exist!");
+					}
+					
+					validateWorldSection(world, config, warnTo, plugin);
+				}
+			}
+		}
+		
+		// Check for the per-world options.
+		if (section.isSet("chunkOverrides")) {
+			if (!section.isConfigurationSection("chunkOverrides")) {
+				warnTo.sendMessage("§c[WDL] ERROR: Chunk overrides (wdl." + 
+						"chunkOverrides) is not a mapping!  Chunk overrides " +
+						"will not be used!");
+			} else {
+				ConfigurationSection chunkOverrides = section
+						.getConfigurationSection("chunkOverrides");
+				List<String> toRemove = new ArrayList<>();
+				
+				for (String key : chunkOverrides.getKeys(false)) {
+					if (!chunkOverrides.isConfigurationSection(key)) {
+						warnTo.sendMessage("§c[WDL] ERROR: Chunk override '" + key
+								+ "' is not a mapping!  It will be ignored!");
+						toRemove.add(key);
+					}
+					ConfigurationSection chunkOverride = (ConfigurationSection)
+							chunkOverrides.getConfigurationSection(key);
+					if (!validateChunkOverride(chunkOverride, key, warnTo, plugin)) {
+						toRemove.add(key);
+					}
+				}
 			}
 		}
 		
@@ -124,9 +154,10 @@ public class ConfigValidation {
 	 * @param worldName The name of the world. 
 	 * @param config The root configuration.
 	 * @param warnTo The player to complain to if something is wrong.
+	 * @param plugin The instance of the plugin.
 	 */
 	private static void validateWorldSection(String worldName,
-			Configuration config, CommandSender warnTo) {
+			Configuration config, CommandSender warnTo, WDLCompanion plugin) {
 		String fullKey = "wdl.per-world." + worldName; 
 		if (!config.isSet(fullKey)) {
 			warnTo.sendMessage("§e[WDL] WARNING: Per-world config validation " +
@@ -320,5 +351,52 @@ public class ConfigValidation {
 					+ " is too long!  It must be shorter than " + maxLength
 					+ " characters!");
 		}
+	}
+	
+	/**
+	 * Validates the given chunk override.
+	 * 
+	 * @param override The {@link ConfigurationSection} for the chunk override.
+	 * @param key ID of the override
+	 * @param warnTo The player to complain to if something is wrong.
+	 * @param plugin The instance of the plugin.
+	 * @return True if the override is valid, false otherwise.
+	 */
+	private static boolean validateChunkOverride(ConfigurationSection override,
+			String key, CommandSender warnTo, WDLCompanion plugin) {
+		if (!override.isString("type")) {
+			 warnTo.sendMessage("§c[WDL] ERROR: 'type' for chunk " 
+					+ "override '" + key + "' is not set or not a "
+					+ "string!  It will be ignored.");
+			 return false;
+		}
+		String type = override.getString("type");
+		if (!plugin.rangeProducers.containsKey(type)) {
+			 warnTo.sendMessage("§c[WDL] ERROR: 'type' for chunk " 
+						+ "override '" + key + "' is not a valid option!  "
+						+ "Currently '" + type + "', expected one of "
+						+ plugin.rangeProducers.keySet() + ".  " 
+						+ "It will be ignored.");
+			 return false;
+		}
+		
+		IRangeProducer producer = plugin.rangeProducers.get(type);
+		
+		List<String> warnings = new ArrayList<>();
+		List<String> errors = new ArrayList<>();
+		
+		if (!producer.isValidConfig(override, warnings, errors)) {
+			for (String s : warnings) {
+				warnTo.sendMessage("§e[WDL] WARNING: " + s);
+			}
+			for (String s : errors) {
+				warnTo.sendMessage("§c[WDL] ERROR: " + s);
+			}
+			warnTo.sendMessage("§c[WDL] ERROR: Config for chunk " 
+					+ "override '" + key + "' is fatally incorrect!  "
+					+ "It will be ignored.");
+			return false;
+		}
+		return true;
 	}
 }

@@ -5,9 +5,16 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import wdl.RangeProducerRegistrationEvent;
+
 /**
  * Something that converts a configuration file into a series of
  * {@link ChunkRange}s.
+ * 
+ * To register a new instance with the plugin, subscribe to the
+ * {@link RangeProducerRegistrationEvent} event and use its
+ * {@link RangeProducerRegistrationEvent#addRegistration(String, IRangeProducer)
+ * addRegistration} method.
  */
 public interface IRangeProducer {
 	/**

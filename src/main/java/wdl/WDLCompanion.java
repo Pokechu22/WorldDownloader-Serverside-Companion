@@ -24,12 +24,17 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
+
+import wdl.range.BlockRangeProducer;
+import wdl.range.ChunkRangeProducer;
+import wdl.range.IRangeProducer;
 
 /**
  * Very simple WDL companion plugin.
@@ -63,6 +68,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	private BookCreator bookCreator;
 	
+	/**
+	 * List of all registered {@link IRangeProducer}s.
+	 */
+	Map<String, IRangeProducer> rangeProducers = new HashMap<>();
+	
 	@Override
 	public void onLoad() {
 		try {
@@ -81,6 +91,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME, this);
 		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
+		this.getServer().getPluginManager().registerEvents(this, this);
 		
 		this.bookCreator = new BookCreator(this);
 		
@@ -199,10 +210,21 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			getLogger().warning("Failed to start PluginMetrics :(");
 		}
 		
-		// Warn about incorrect config setup.
-		// Using the console sender because it supports coloration. 
-		ConfigValidation.validateConfig(getConfig(), getServer()
-				.getConsoleSender());
+		
+		// Let everything else finish and then call events and perform the
+		// rangeProducer registration.
+		getServer().getScheduler().runTaskLater(this, new Runnable() {
+			@Override
+			public void run() {
+				getServer().getPluginManager().callEvent(
+						new RangeProducerRegistrationEvent(WDLCompanion.this));
+				
+				// Warn about incorrect config setup.
+				// Using the console sender because it supports coloration. 
+				ConfigValidation.validateConfig(getConfig(), getServer()
+						.getConsoleSender(), WDLCompanion.this);
+			}
+		}, 1);
 	}
 
 	@Override
@@ -211,6 +233,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME);
 		this.getServer().getMessenger()
 				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
+	}
+	
+	@EventHandler
+	public void registerRanges(RangeProducerRegistrationEvent event) {
+		event.addRegistration("BlockRange", new BlockRangeProducer());
+		event.addRegistration("ChunkRange", new ChunkRangeProducer());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -256,7 +284,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 				
 				reloadConfig();
-				ConfigValidation.validateConfig(getConfig(), sender);
+				ConfigValidation.validateConfig(getConfig(), sender, this);
 				
 				updateAllPlayers();
 				
@@ -624,6 +652,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		String requestMessage = getWorldStringConfigValue(player.getWorld(),
 				"requestMessage");
 		packets[3] = WDLPackets.createWDLPacket3(requestMessage);
+		
+		//TODO: Handle packet #4
 		
 		return packets;
 	}
