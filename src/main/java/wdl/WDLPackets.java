@@ -1,5 +1,6 @@
 package wdl;
 
+import java.util.List;
 import java.util.Map;
 
 import wdl.range.ChunkRange;
@@ -141,14 +142,14 @@ public class WDLPackets {
 	 * 
 	 * @return
 	 */
-	public static byte[] createWDLPacket4(ChunkRange... ranges) {
+	public static byte[] createWDLPacket4(List<ChunkRange> ranges) {
 		ByteArrayDataOutput output = ByteStreams.newDataOutput();
 		
 		output.writeInt(4);
 		
 		output.writeBoolean(true); //Override old data.  For now, always true.
 		
-		output.writeInt(ranges.length);
+		output.writeInt(ranges.size());
 		
 		for (ChunkRange range : ranges) {
 			output.writeBoolean(range.isWhitelist);

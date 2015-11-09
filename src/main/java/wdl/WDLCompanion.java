@@ -3,7 +3,9 @@ package wdl;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -33,6 +35,7 @@ import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
 import wdl.range.BlockRangeProducer;
+import wdl.range.ChunkRange;
 import wdl.range.ChunkRangeProducer;
 import wdl.range.IRangeProducer;
 
@@ -611,13 +614,35 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 	
 	/**
+	 * Gets the ranges that apply to the given player.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	private List<ChunkRange> getRanges(Player player) {
+		ArrayList<ChunkRange> ranges = new ArrayList<>();
+		ConfigurationSection config = getConfig();
+		if (!config.isSet("wdl.chunkOverrides")) {
+			return ranges;
+		}
+		ConfigurationSection overrides = config
+				.getConfigurationSection("wdl.chunkOverrides");
+		for (String key : overrides.getKeys(false)) {
+			ConfigurationSection override = overrides.getConfigurationSection(key);
+			IRangeProducer producer = rangeProducers.get(override.getString("type"));
+			ranges.addAll(producer.getRanges(player, override));
+		}
+		return ranges;
+	}
+	
+	/**
 	 * Creates the byte arrays for all of the WDL packets.
 	 * 
 	 * @param player
 	 * @return
 	 */
 	private byte[][] createWDLPackets(Player player) {
-		byte[][] packets = new byte[4][];
+		byte[][] packets = new byte[5][];
 		
 		//Packet #1
 		boolean globalIsEnabled = getConfigValue(player,
@@ -653,7 +678,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				"requestMessage");
 		packets[3] = WDLPackets.createWDLPacket3(requestMessage);
 		
-		//TODO: Handle packet #4
+		//Packet #4
+		List<ChunkRange> ranges = getRanges(player);
+		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;
 	}
