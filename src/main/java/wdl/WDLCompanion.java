@@ -35,7 +35,7 @@ import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
 import wdl.range.BlockRangeProducer;
-import wdl.range.ChunkRange;
+import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeProducer;
 import wdl.range.IRangeProducer;
 
@@ -619,8 +619,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @param player
 	 * @return
 	 */
-	private List<ChunkRange> getRanges(Player player) {
-		ArrayList<ChunkRange> ranges = new ArrayList<>();
+	private List<ProtectionRange> getRanges(Player player) {
+		ArrayList<ProtectionRange> ranges = new ArrayList<>();
 		ConfigurationSection config = getConfig();
 		if (!config.isSet("wdl.chunkOverrides")) {
 			return ranges;
@@ -679,7 +679,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		packets[3] = WDLPackets.createWDLPacket3(requestMessage);
 		
 		//Packet #4
-		List<ChunkRange> ranges = getRanges(player);
+		List<ProtectionRange> ranges = getRanges(player);
 		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;

@@ -11,14 +11,14 @@ import org.bukkit.entity.Player;
  */
 public class ChunkRangeProducer implements IRangeProducer {
 	@Override
-	public List<ChunkRange> getRanges(Player player, ConfigurationSection config) {
+	public List<ProtectionRange> getRanges(Player player, ConfigurationSection config) {
 		boolean whitelist = config.getBoolean("whitelist");
 		int x1 = config.getInt("x1");
 		int y1 = config.getInt("y1");
 		int x2 = config.getInt("x2");
 		int y2 = config.getInt("y2");
 		
-		return Arrays.asList(new ChunkRange(x1, y1, x2, y2, whitelist));
+		return Arrays.asList(new ProtectionRange(x1, y1, x2, y2, whitelist));
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package wdl;
 import java.util.List;
 import java.util.Map;
 
-import wdl.range.ChunkRange;
+import wdl.range.ProtectionRange;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -142,7 +142,7 @@ public class WDLPackets {
 	 * 
 	 * @return
 	 */
-	public static byte[] createWDLPacket4(List<ChunkRange> ranges) {
+	public static byte[] createWDLPacket4(List<ProtectionRange> ranges) {
 		ByteArrayDataOutput output = ByteStreams.newDataOutput();
 		
 		output.writeInt(4);
@@ -151,7 +151,7 @@ public class WDLPackets {
 		
 		output.writeInt(ranges.size());
 		
-		for (ChunkRange range : ranges) {
+		for (ProtectionRange range : ranges) {
 			output.writeBoolean(range.isWhitelist);
 			int x1 = range.x1, y1 = range.y1;
 			int x2 = range.x2, y2 = range.y2;

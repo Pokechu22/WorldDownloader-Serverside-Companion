@@ -9,7 +9,7 @@ import wdl.RangeProducerRegistrationEvent;
 
 /**
  * Something that converts a configuration file into a series of
- * {@link ChunkRange}s.
+ * {@link ProtectionRange}s.
  * 
  * To register a new instance with the plugin, subscribe to the
  * {@link RangeProducerRegistrationEvent} event and use its
@@ -25,9 +25,9 @@ public interface IRangeProducer {
 	 *            The player to get ranges for.
 	 * @param config
 	 *            The configuration to use.
-	 * @return A list of {@link ChunkRange}s.
+	 * @return A list of {@link ProtectionRange}s.
 	 */
-	public abstract List<ChunkRange> getRanges(Player player,
+	public abstract List<ProtectionRange> getRanges(Player player,
 			ConfigurationSection config);
 	
 	/**
