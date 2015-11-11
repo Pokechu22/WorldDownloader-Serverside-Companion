@@ -153,22 +153,22 @@ public class WDLPackets {
 		
 		for (ProtectionRange range : ranges) {
 			output.writeBoolean(range.isWhitelist);
-			int x1 = range.x1, y1 = range.y1;
-			int x2 = range.x2, y2 = range.y2;
+			int x1 = range.x1, z1 = range.z1;
+			int x2 = range.x2, z2 = range.z2;
 			
 			if (x1 > x2) {
 				x2 = range.x1;
 				x1 = range.x2;
 			}
-			if (y1 > y2) {
-				y2 = range.y1;
-				y1 = range.y2;
+			if (z1 > z2) {
+				z2 = range.z1;
+				z1 = range.z2;
 			}
 			
 			output.writeInt(x1);
-			output.writeInt(y1);
+			output.writeInt(z1);
 			output.writeInt(x2);
-			output.writeInt(y2);
+			output.writeInt(z2);
 		}
 		
 		return output.toByteArray();

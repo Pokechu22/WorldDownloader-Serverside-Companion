@@ -14,11 +14,11 @@ public class BlockRangeProducer implements IRangeProducer {
 	public List<ProtectionRange> getRanges(Player player, ConfigurationSection config) {
 		boolean whitelist = config.getBoolean("whitelist");
 		int x1 = config.getInt("x1") / 16;
-		int y1 = config.getInt("y1") / 16;
+		int z1 = config.getInt("z1") / 16;
 		int x2 = config.getInt("x2") / 16;
-		int y2 = config.getInt("y2") / 16;
+		int z2 = config.getInt("z2") / 16;
 		
-		return Arrays.asList(new ProtectionRange(x1, y1, x2, y2, whitelist));
+		return Arrays.asList(new ProtectionRange(x1, z1, x2, z2, whitelist));
 	}
 
 	@Override
@@ -37,20 +37,20 @@ public class BlockRangeProducer implements IRangeProducer {
 			errors.add("'x2' must be an int!");
 			hasErrors = true;
 		}
-		if (!config.isInt("y1")) {
-			errors.add("'y1' must be an int!");
+		if (!config.isInt("z1")) {
+			errors.add("'z1' must be an int!");
 			hasErrors = true;
 		}
-		if (!config.isInt("y2")) {
-			errors.add("'y2' must be an int!");
+		if (!config.isInt("z2")) {
+			errors.add("'z2' must be an int!");
 			hasErrors = true;
 		}
 		
 		if (config.getInt("x1") > config.getInt("x2")) {
 			warnings.add("'x1' should be not be greater than 'x2'!");
 		}
-		if (config.getInt("y1") > config.getInt("y2")) {
-			warnings.add("'y1' should be not be greater than 'y2'!");
+		if (config.getInt("z1") > config.getInt("z2")) {
+			warnings.add("'z1' should be not be greater than 'z2'!");
 		}
 		
 		return !hasErrors;
