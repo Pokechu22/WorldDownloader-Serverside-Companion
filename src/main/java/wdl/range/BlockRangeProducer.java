@@ -18,7 +18,7 @@ public class BlockRangeProducer implements IRangeProducer {
 		int x2 = config.getInt("x2") / 16;
 		int z2 = config.getInt("z2") / 16;
 		
-		return Arrays.asList(new ProtectionRange(x1, z1, x2, z2, whitelist));
+		return Arrays.asList(new ProtectionRange("", whitelist, x1, z1, x2, z2));
 	}
 
 	@Override

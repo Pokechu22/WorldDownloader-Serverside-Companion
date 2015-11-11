@@ -5,19 +5,24 @@ package wdl.range;
  * swapped, and if z1 is greater than z2, they will be swapped.
  */
 public final class ProtectionRange {
-	public ProtectionRange(int x1, int z1, int x2, int z2, boolean isWhitelist) {
+	public ProtectionRange(String tag, boolean isWhitelist, int x1, int z1, int x2, int z2) {
+		if (tag == null) {
+			tag = "";
+		}
+		this.tag = tag;
+		this.isWhitelist = isWhitelist;
 		this.x1 = x1;
 		this.z1 = z1;
 		this.x2 = x2;
 		this.z2 = z2;
-		this.isWhitelist = isWhitelist;
 	}
 	
 	/**
-	 * Range of coordinates.  If x1 is greater than x2, they will be swapped
-	 * (and the same for y).  These are chunk coordinates.
+	 * "Tag" for this chunk.  Multiple {@link ProtectionRange}s can share the
+	 * same tag; this is used to identify sub groups.  May be empty.  If null
+	 * is passed to the constructor for tag, an empty string is used instead.
 	 */
-	public final int x1, z1, x2, z2;
+	public final String tag;
 	/**
 	 * Whether to allow downloading in the given range of chunks.
 	 * 
@@ -25,4 +30,9 @@ public final class ProtectionRange {
 	 * False: No downloading is allowed in that chunk.
 	 */
 	public final boolean isWhitelist;
+	/**
+	 * Range of coordinates.  If x1 is greater than x2, they will be swapped
+	 * (and the same for y).  These are chunk coordinates.
+	 */
+	public final int x1, z1, x2, z2;
 }
