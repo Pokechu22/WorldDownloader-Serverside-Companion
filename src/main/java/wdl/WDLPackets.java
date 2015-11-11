@@ -152,7 +152,9 @@ public class WDLPackets {
 		output.writeInt(ranges.size());
 		
 		for (ProtectionRange range : ranges) {
+			output.writeUTF(range.tag);
 			output.writeBoolean(range.isWhitelist);
+			
 			int x1 = range.x1, z1 = range.z1;
 			int x2 = range.x2, z2 = range.z2;
 			
@@ -174,3 +176,4 @@ public class WDLPackets {
 		return output.toByteArray();
 	}
 }
+
