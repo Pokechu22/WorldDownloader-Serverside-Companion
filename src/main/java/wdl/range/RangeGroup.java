@@ -35,9 +35,13 @@ public class RangeGroup {
 	 * 
 	 * @param ranges An array of the ranges to add.
 	 * 
+	 * @throws IllegalArgumentException If player is null.
 	 * @throws IllegalArgumentException If ranges is null, or any value in ranges is null.
 	 */
-	public void addRanges(ProtectionRange... ranges) {
+	public void addRanges(Player player, ProtectionRange... ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
 		}
@@ -55,9 +59,13 @@ public class RangeGroup {
 	 * 
 	 * @param ranges An array of the new ranges.
 	 * 
+	 * @throws IllegalArgumentException If player is null.
 	 * @throws IllegalArgumentException If ranges is null, or any value in ranges is null.
 	 */
-	public void setRanges(ProtectionRange... ranges) {
+	public void setRanges(Player player, ProtectionRange... ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
 		}
@@ -75,9 +83,13 @@ public class RangeGroup {
 	 * 
 	 * @param tags An array of tags to remove.
 	 * 
+	 * @throws IllegalArgumentException If player is null.
 	 * @throws IllegalArgumentException If tags is null, or any value in tags is null.
 	 */
-	public void removeRangesByTags(String... tags) {
+	public void removeRangesByTags(Player player, String... tags) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
 		if (tags == null) {
 			throw new IllegalArgumentException("tags must not be null!  (group is " + groupName + ")");
 		}
@@ -97,11 +109,15 @@ public class RangeGroup {
 	 * @param tag The tag to overwrite.
 	 * @param ranges The new ranges for that tag.
 	 * 
+	 * @throws IllegalArgumentException If player is null.
 	 * @throws IllegalArgumentException If tag is null.
 	 * @throws IllegalArgumentException If ranges is null, or any value in ranges is null.
 	 * @throws IllegalArgumentException If any range in ranges does not have the same tag.
 	 */
-	public void setTagRanges(String tag, ProtectionRange... ranges) {
+	public void setTagRanges(Player player, String tag, ProtectionRange... ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
 		if (tag == null) {
 			throw new IllegalArgumentException("tag must not be null!  (group is " + groupName + ")");
 		}
