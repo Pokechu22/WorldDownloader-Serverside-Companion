@@ -51,14 +51,14 @@ import wdl.range.IRangeProducer;
  */
 public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageListener {
 	/**
-	 * The name of the plugin channel used for WDL control.
+	 * The name of the plugin channel sent by WDL to request permissions.
 	 */
-	private static final String INIT_CHANNEL_NAME = "WDL|INIT";
+	public static final String INIT_CHANNEL_NAME = "WDL|INIT";
 	
 	/**
 	 * The name of the plugin channel used for WDL control.
 	 */
-	private static final String CONTROL_CHANNEL_NAME = "WDL|CONTROL";
+	public static final String CONTROL_CHANNEL_NAME = "WDL|CONTROL";
 
 	/**
 	 * Cached entity ranges.
