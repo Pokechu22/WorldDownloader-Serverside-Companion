@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
  * Basic range group producer that takes parameters and uses those.
  */
 public final class SimpleRangeProducer implements IRangeProducer {
-	private final RangeGroup group;
+	private final IRangeGroup group;
 	/**
 	 * Whether the created ranges are whitelisting or blacklisting.
 	 */
@@ -34,7 +34,7 @@ public final class SimpleRangeProducer implements IRangeProducer {
 	 * @param x2 X2 coordinate for the created groups.
 	 * @param z2 Z2 coordinate for the created groups.
 	 */
-	public SimpleRangeProducer(RangeGroup group, boolean whitelist,
+	public SimpleRangeProducer(IRangeGroup group, boolean whitelist,
 			String tag, int x1, int z1, int x2, int z2) {
 		this.group = group;
 		this.whitelist = whitelist;
@@ -51,7 +51,7 @@ public final class SimpleRangeProducer implements IRangeProducer {
 	}
 	
 	@Override
-	public RangeGroup getRangeGroup() {
+	public IRangeGroup getRangeGroup() {
 		return this.group;
 	}
 }

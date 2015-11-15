@@ -36,11 +36,11 @@ import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
 import wdl.range.BlockRangeGroupType;
+import wdl.range.IRangeGroup;
 import wdl.range.IRangeGroupType;
 import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
-import wdl.range.RangeGroup;
 
 /**
  * Very simple WDL companion plugin.
@@ -257,7 +257,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 								+ ", but that was not found.");
 					}
 					
-					RangeGroup group = new RangeGroup(key);
+					IRangeGroup group = new RangeGroup(key);
 					IRangeProducer producer = type.createRangeProducer(group,
 							override);
 					

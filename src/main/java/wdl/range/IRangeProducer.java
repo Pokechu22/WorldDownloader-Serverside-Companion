@@ -22,7 +22,7 @@ public interface IRangeProducer {
 	 * Gets the range group that corresponds with this {@link IRangeProducer}.
 	 * This group should be passed to and set in the constructor.
 	 * 
-	 * @return The corresponding {@link RangeGroup}.
+	 * @return The corresponding {@link IRangeGroup}.
 	 */
-	public abstract RangeGroup getRangeGroup();
+	public abstract IRangeGroup getRangeGroup();
 }

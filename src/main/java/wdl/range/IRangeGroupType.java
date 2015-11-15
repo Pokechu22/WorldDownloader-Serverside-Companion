@@ -36,5 +36,5 @@ public interface IRangeGroupType<T extends IRangeProducer> {
 	 *            The config to check.
 	 */
 	public abstract T createRangeProducer(
-			RangeGroup group, ConfigurationSection config);
+			IRangeGroup group, ConfigurationSection config);
 }

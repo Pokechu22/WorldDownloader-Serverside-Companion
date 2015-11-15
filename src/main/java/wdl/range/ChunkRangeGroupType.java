@@ -10,7 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 public final class ChunkRangeGroupType implements
 		IRangeGroupType<SimpleRangeProducer> {
 	@Override
-	public SimpleRangeProducer createRangeProducer(RangeGroup group,
+	public SimpleRangeProducer createRangeProducer(IRangeGroup group,
 			ConfigurationSection config) {
 		String tag = config.getString("tag");
 		boolean whitelist = config.getBoolean("whitelist");
