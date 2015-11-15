@@ -388,8 +388,16 @@ public class ConfigValidation {
 		List<String> errors = new ArrayList<>();
 		
 		boolean valid = type.isValidConfig(override, warnings, errors);
+		if (!warnings.isEmpty()) {
+			warnTo.sendMessage("§e[WDL] There are warnings for chunk override '"
+					+ key + "': ");
+		}
 		for (String s : warnings) {
 			warnTo.sendMessage("§e[WDL] WARNING: " + s);
+		}
+		if (!errors.isEmpty()) {
+			warnTo.sendMessage("§c[WDL] There are errors for chunk override '"
+					+ key + "': ");
 		}
 		for (String s : errors) {
 			warnTo.sendMessage("§c[WDL] ERROR: " + s);
