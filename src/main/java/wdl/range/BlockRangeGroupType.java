@@ -2,6 +2,7 @@ package wdl.range;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -18,8 +19,10 @@ public final class BlockRangeGroupType implements
 		int z1 = config.getInt("z1") / 16;
 		int x2 = config.getInt("x2") / 16;
 		int z2 = config.getInt("z2") / 16;
+		String world = config.getString("world");
 		
-		return new SimpleRangeProducer(group, whitelist, tag, x1, z1, x2, z2);
+		return new SimpleRangeProducer(group, whitelist, tag, x1, z1, x2, z2,
+				world);
 	}
 
 	@Override
@@ -46,12 +49,22 @@ public final class BlockRangeGroupType implements
 			errors.add("'z2' must be an int!");
 			hasErrors = true;
 		}
+		if (config.isSet("world") && !config.isString("world")) {
+			errors.add("'world' must be a String or left unset!");
+			hasErrors = true;
+		}
 		
 		if (config.getInt("x1") > config.getInt("x2")) {
 			warnings.add("'x1' should be not be greater than 'x2'!");
 		}
 		if (config.getInt("z1") > config.getInt("z2")) {
 			warnings.add("'z1' should be not be greater than 'z2'!");
+		}
+		boolean isAllWorlds = (!config.isSet("world") || config.getString(
+				"world").equals("*"));
+		if (!isAllWorlds && Bukkit.getWorld(config.getString("world")) == null) {
+			warnings.add("'world' (" + config.getString("world") + ") " +
+					"corresponds with a world that currently does not exist!");
 		}
 		
 		return !hasErrors;
