@@ -162,14 +162,13 @@ public class WDLPackets {
 	/**
 	 * Writes a protection range to the given output stream.
 	 * 
-	 * This is a string with the range's tag, then the boolean stating whether
-	 * the range is whitelisting, and then the coordinates (x1, z1, x2, z2).
-	 * This method also swaps x1 and x2 if x1 is greater than x2.
+	 * This is a string with the range's tag, then 4 integers for the
+	 * coordinates (x1, z1, x2, z2). This method also swaps x1 and x2 if x1 is
+	 * greater than x2.
 	 */
 	private static void writeProtectionRange(ProtectionRange range, 
 			ByteArrayDataOutput output) {
 		output.writeUTF(range.tag);
-		output.writeBoolean(range.isWhitelist);
 		
 		int x1 = range.x1, z1 = range.z1;
 		int x2 = range.x2, z2 = range.z2;

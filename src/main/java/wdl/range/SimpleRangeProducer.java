@@ -11,10 +11,6 @@ import org.bukkit.entity.Player;
 public final class SimpleRangeProducer implements IRangeProducer {
 	private final IRangeGroup group;
 	/**
-	 * Whether the created ranges are whitelisting or blacklisting.
-	 */
-	public final boolean whitelist;
-	/**
 	 * The tag to use for the created ranges.
 	 */
 	public final String tag;
@@ -27,7 +23,7 @@ public final class SimpleRangeProducer implements IRangeProducer {
 	 */
 	public final boolean appliesToAllWorlds;
 	/**
-	 * Name of the world that the created groups are in.  Will be 'null' if
+	 * Name of the world that the created ranges are in.  Will be 'null' if
 	 * {@link #appliesToAllWorlds} is false.
 	 */
 	public final String worldName;
@@ -37,26 +33,23 @@ public final class SimpleRangeProducer implements IRangeProducer {
 	 * 
 	 * @param group
 	 *            The owning range group.
-	 * @param whitelist
-	 *            Whether the created groups are whitelisting or blacklisting.
 	 * @param tag
-	 *            The tag to use for the created groups.
+	 *            The tag to use for the created ranges.
 	 * @param x1
-	 *            X1 coordinate for the created groups.
+	 *            X1 coordinate for the created ranges.
 	 * @param z1
-	 *            Z1 coordinate for the created groups.
+	 *            Z1 coordinate for the created ranges.
 	 * @param x2
-	 *            X2 coordinate for the created groups.
+	 *            X2 coordinate for the created ranges.
 	 * @param z2
-	 *            Z2 coordinate for the created groups.
+	 *            Z2 coordinate for the created ranges.
 	 * @param worldName
-	 *            Name of the world that the created groups are in. May be null
+	 *            Name of the world that the created ranges are in. May be null
 	 *            or "*", in which case it is all worlds.
 	 */
-	public SimpleRangeProducer(IRangeGroup group, boolean whitelist,
-			String tag, int x1, int z1, int x2, int z2, String worldName) {
+	public SimpleRangeProducer(IRangeGroup group, String tag, int x1, int z1,
+			int x2, int z2, String worldName) {
 		this.group = group;
-		this.whitelist = whitelist;
 		this.tag = tag;
 		this.x1 = x1;
 		this.z1 = z1;
@@ -76,7 +69,7 @@ public final class SimpleRangeProducer implements IRangeProducer {
 		List<ProtectionRange> ranges = new ArrayList<>();
 		
 		if (appliesToAllWorlds || player.getWorld().getName().equals(worldName)) {
-			ranges.add(new ProtectionRange(tag, whitelist, x1, z1, x2, z2));
+			ranges.add(new ProtectionRange(tag, x1, z1, x2, z2));
 		}
 		return ranges;
 	}

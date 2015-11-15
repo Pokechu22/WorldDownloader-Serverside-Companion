@@ -14,25 +14,19 @@ public final class BlockRangeGroupType implements
 	public SimpleRangeProducer createRangeProducer(IRangeGroup group,
 			ConfigurationSection config) {
 		String tag = config.getString("tag");
-		boolean whitelist = config.getBoolean("whitelist");
 		int x1 = config.getInt("x1") / 16;
 		int z1 = config.getInt("z1") / 16;
 		int x2 = config.getInt("x2") / 16;
 		int z2 = config.getInt("z2") / 16;
 		String world = config.getString("world");
 		
-		return new SimpleRangeProducer(group, whitelist, tag, x1, z1, x2, z2,
-				world);
+		return new SimpleRangeProducer(group, tag, x1, z1, x2, z2, world);
 	}
 
 	@Override
 	public boolean isValidConfig(ConfigurationSection config,
 			List<String> warnings, List<String> errors) {
 		boolean hasErrors = false;
-		if (!config.isBoolean("whitelist")) {
-			errors.add("'whitelist' must be a boolean!");
-			hasErrors = true;
-		}
 		if (!config.isInt("x1")) {
 			errors.add("'x1' must be an int!");
 			hasErrors = true;
