@@ -1,5 +1,7 @@
 package wdl;
 
+import java.util.Arrays;
+
 import org.bukkit.entity.Player;
 
 import wdl.range.IRangeGroup;
@@ -16,6 +18,10 @@ class RangeGroup implements IRangeGroup {
 	 * Name of this range group.
 	 */
 	private final String groupName;
+	/**
+	 * Instance of the plugin.
+	 */
+	private final WDLCompanion plugin;
 	
 	/**
 	 * Creates a new RangeGroup. Intended for use by the WDLCompanion plugin
@@ -24,12 +30,15 @@ class RangeGroup implements IRangeGroup {
 	 * 
 	 * @param groupName
 	 *            Name of the range group.
+	 * @param plugin
+	 *            The plugin instance.
 	 */
-	RangeGroup(String groupName) {
+	RangeGroup(String groupName, WDLCompanion plugin) {
 		if (groupName == null) {
 			throw new IllegalArgumentException("groupName must not be null!");
 		}
 		this.groupName = groupName;
+		this.plugin = plugin;
 	}
 	
 	@Override
@@ -51,7 +60,9 @@ class RangeGroup implements IRangeGroup {
 			}
 		}
 		
-		//TODO
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket5(groupName, false,
+						Arrays.asList(ranges)));
 	}
 	
 	@Override
@@ -68,7 +79,9 @@ class RangeGroup implements IRangeGroup {
 			}
 		}
 		
-		//TODO
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket5(groupName, true,
+						Arrays.asList(ranges)));
 	}
 	
 	@Override
@@ -85,7 +98,8 @@ class RangeGroup implements IRangeGroup {
 			}
 		}
 		
-		//TODO
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket6(groupName, Arrays.asList(tags)));
 	}
 	
 	@Override
@@ -108,7 +122,10 @@ class RangeGroup implements IRangeGroup {
 			}
 		}
 		
-		//TODO
+		plugin.queuePacket(
+				player,
+				WDLPackets.createWDLPacket7(groupName, tag,
+						Arrays.asList(ranges)));
 	}
 	
 	@Override

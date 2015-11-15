@@ -3,6 +3,7 @@ package wdl;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -256,7 +257,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 								+ ", but that was not found.");
 					}
 					
-					IRangeGroup group = new RangeGroup(key);
+					IRangeGroup group = new RangeGroup(key, WDLCompanion.this);
 					IRangeProducer producer = type.createRangeProducer(group,
 							override);
 					
@@ -709,5 +710,66 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;
+	}
+	
+	/**
+	 * Queues a plugin channel packet to be sent to the given player on the next
+	 * tick.
+	 * 
+	 * @param player
+	 *            The player to send the packet to.
+	 * @param data
+	 *            The packet to send.
+	 */
+	void queuePacket(Player to, byte[] data) {
+		if (to == null) {
+			throw new IllegalArgumentException("'to' must not be null!");
+		}
+		if (data == null) {
+			throw new IllegalArgumentException("'data' must not be null!");
+		}
+		
+		synchronized (packetsToSend) {
+			boolean addRunnable = packetsToSend.isEmpty();
+			
+			PacketInfo packet = new PacketInfo(to, CONTROL_CHANNEL_NAME, data);
+			
+			packetsToSend.add(packet);
+			
+			if (addRunnable) {
+				Bukkit.getScheduler().runTask(this, new Runnable() {
+					@Override
+					public void run() {
+						synchronized (packetsToSend) {
+							for (PacketInfo packet : packetsToSend) {
+								packet.player.sendPluginMessage(
+										WDLCompanion.this, packet.channel,
+										packet.data);
+							}
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	/**
+	 * Packets to send on the next server tick.
+	 */
+	private List<PacketInfo> packetsToSend = new ArrayList<>();
+	
+	/**
+	 * Packet to send to a player.
+	 */
+	private class PacketInfo {
+		public PacketInfo(Player player, String channel, byte[] data) {
+			this.player = player;
+			this.channel = channel;
+			this.data = data;
+		}
+		
+		public final Player player;
+		public final String channel;
+		public final byte[] data;
 	}
 }

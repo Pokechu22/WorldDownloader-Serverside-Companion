@@ -160,6 +160,88 @@ public class WDLPackets {
 	}
 	
 	/**
+	 * Creates the WDL packet #5.
+	 * 
+	 * This packet specifies adds additional overrides to or sets all of the
+	 * overrides in a single group.
+	 *
+	 * This packet starts with a String stating the group, then a boolean that
+	 * specifies whether it is setting (true) or adding (false) the ranges, and
+	 * then an int (the number of ranges that will be added). Then, each range,
+	 * formated by
+	 * {@link #writeProtectionRange(ProtectionRange, ByteArrayDataOutput)}.
+	 */
+	public static byte[] createWDLPacket5(String group,
+			boolean replace, List<ProtectionRange> ranges) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(5);
+		
+		output.writeUTF(group);
+		output.writeBoolean(replace);
+		output.writeInt(ranges.size());
+		
+		for (ProtectionRange range : ranges) {
+			writeProtectionRange(range, output);
+		}
+		
+		return output.toByteArray();
+	}
+	
+	/**
+	 * Creates the WDL packet #6.
+	 * 
+	 * This packet removes a series of ranges in the given group based off of
+	 * the tags.
+	 * 
+	 * This packet is simply a string (the group), followed by an int (number of
+	 * tags), followed by each of the tags.
+	 */
+	public static byte[] createWDLPacket6(String group, List<String> tags) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(6);
+		
+		output.writeUTF(group);
+		output.writeInt(tags.size());
+		
+		for (String tag : tags) {
+			output.writeUTF(tag);
+		}
+		
+		return output.toByteArray();
+	}
+	
+	/**
+	 * Creates the WDL packet #7.
+	 * 
+	 * This packet replaces all of the ranges with the given tag with a new set
+	 * of ranges.
+	 *
+	 * This packet starts with a String stating the group, then a second string
+	 * that specifies the tag to replace. After that, there is an int stating
+	 * the number of ranges, and then each range as formated by
+	 * {@link #writeProtectionRange(ProtectionRange, ByteArrayDataOutput)}.
+	 */
+	public static byte[] createWDLPacket7(String group,
+			String tag, List<ProtectionRange> newRanges) {
+		ByteArrayDataOutput output = ByteStreams.newDataOutput();
+		
+		output.writeInt(7);
+		
+		output.writeUTF(group);
+		output.writeUTF(tag);
+		
+		output.writeInt(newRanges.size());
+		
+		for (ProtectionRange range : newRanges) {
+			writeProtectionRange(range, output);
+		}
+		
+		return output.toByteArray();
+	}
+	
+	/**
 	 * Writes a protection range to the given output stream.
 	 * 
 	 * This is a string with the range's tag, then 4 integers for the
