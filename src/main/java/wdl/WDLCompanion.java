@@ -3,7 +3,6 @@ package wdl;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -652,21 +651,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	/**
 	 * Gets the ranges that apply to the given player.
-	 * TODO: This method probably should be restructured
-	 * to use the tag system and such more cleanly.
-	 * 
-	 * @param player
-	 * @return
 	 */
-	private List<ProtectionRange> getRanges(Player player) {
-		ArrayList<ProtectionRange> ranges = new ArrayList<>();
-		ConfigurationSection config = getConfig();
-		if (!config.isSet("wdl.chunkOverrides")) {
-			return ranges;
-		}
+	private Map<String, List<ProtectionRange>> getRanges(Player player) {
+		Map<String, List<ProtectionRange>> ranges = new HashMap<>();
 		
-		for (IRangeProducer producer : rangeProducers.values()) {
-			ranges.addAll(producer.getInitialRanges(player));
+		for (Map.Entry<String, IRangeProducer> e : rangeProducers.entrySet()) {
+			ranges.put(e.getKey(), e.getValue().getInitialRanges(player));
 		}
 		return ranges;
 	}
@@ -715,7 +705,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		packets[3] = WDLPackets.createWDLPacket3(requestMessage);
 		
 		//Packet #4
-		List<ProtectionRange> ranges = getRanges(player);
+		Map<String, List<ProtectionRange>> ranges = getRanges(player);
 		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;
