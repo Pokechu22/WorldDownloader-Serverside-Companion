@@ -1,6 +1,7 @@
 package wdl;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -66,6 +67,24 @@ class RangeGroup implements IRangeGroup {
 	}
 	
 	@Override
+	public void addRanges(Player player, List<ProtectionRange> ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (ranges == null) {
+			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
+		}
+		for (int i = 0; i < ranges.size(); i++) {
+			if (ranges.get(i) == null) {
+				throw new IllegalArgumentException("No range in ranges may be null!  (#" + i + " was; group is " + groupName + ")");
+			}
+		}
+		
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket5(groupName, false, ranges));
+	}
+
+	@Override
 	public void setRanges(Player player, ProtectionRange... ranges) {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
@@ -85,6 +104,24 @@ class RangeGroup implements IRangeGroup {
 	}
 	
 	@Override
+	public void setRanges(Player player, List<ProtectionRange> ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (ranges == null) {
+			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
+		}
+		for (int i = 0; i < ranges.size(); i++) {
+			if (ranges.get(i) == null) {
+				throw new IllegalArgumentException("No range in ranges may be null!  (#" + i + " was; group is " + groupName + ")");
+			}
+		}
+		
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket5(groupName, true, ranges));
+	}
+
+	@Override
 	public void removeRangesByTags(Player player, String... tags) {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
@@ -102,6 +139,23 @@ class RangeGroup implements IRangeGroup {
 				WDLPackets.createWDLPacket6(groupName, Arrays.asList(tags)));
 	}
 	
+	@Override
+	public void removeRangesByTags(Player player, List<String> tags) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (tags == null) {
+			throw new IllegalArgumentException("tags must not be null!  (group is " + groupName + ")");
+		}
+		for (int i = 0; i < tags.size(); i++) {
+			if (tags.get(i) == null) {
+				throw new IllegalArgumentException("No tag in tags may be null!  (#" + i + " was; group is " + groupName + ")");
+			}
+		}
+		
+		plugin.queuePacket(player, WDLPackets.createWDLPacket6(groupName, tags));
+	}
+
 	@Override
 	public void setTagRanges(Player player, String tag, ProtectionRange... ranges) {
 		if (player == null) {
@@ -128,6 +182,30 @@ class RangeGroup implements IRangeGroup {
 						Arrays.asList(ranges)));
 	}
 	
+	@Override
+	public void setTagRanges(Player player, String tag, List<ProtectionRange> ranges) {
+		if (player == null) {
+			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (tag == null) {
+			throw new IllegalArgumentException("tag must not be null!  (group is " + groupName + ")");
+		}
+		if (ranges == null) {
+			throw new IllegalArgumentException("ranges must not be null!  (tag is " + tag + "; group is " + groupName + ")");
+		}
+		for (int i = 0; i < ranges.size(); i++) {
+			if (ranges.get(i) == null) {
+				throw new IllegalArgumentException("No range in ranges may be null!  (#" + i + " was; tag is " + tag + "; group is " + groupName + ")");
+			}
+			if (!tag.equals(ranges.get(i).tag)) {
+				throw new IllegalArgumentException("No range in ranges may have a tag different from the tag!  (#" + i + " had tag " + ranges.get(i).tag + "; expected tag is " + tag + "; group is " + groupName + ")");
+			}
+		}
+		
+		plugin.queuePacket(player,
+				WDLPackets.createWDLPacket7(groupName, tag, ranges));
+	}
+
 	@Override
 	public boolean isWDLPlayer(Player player) {
 		return player.getListeningPluginChannels().contains(
