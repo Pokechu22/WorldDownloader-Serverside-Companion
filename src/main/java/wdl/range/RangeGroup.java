@@ -8,13 +8,21 @@ import wdl.WDLCompanion;
  * Group of {@link ProtectionRange}s, which can be edited and will send
  * packets as needed.
  */
-public class RangeGroup {
+public final class RangeGroup {
 	/**
 	 * Name of this range group.
 	 */
 	private final String groupName;
 	
-	RangeGroup(String groupName) {
+	/**
+	 * Creates a new RangeGroup. Intended for use by the WDLCompanion plugin
+	 * only; this is a wrapper. Others should use {@link IRangeGroupType} /
+	 * {@link IRangeProducer}, which will receive an instance of this class.
+	 * 
+	 * @param groupName
+	 *            Name of the range group.
+	 */
+	public RangeGroup(String groupName) {
 		if (groupName == null) {
 			throw new IllegalArgumentException("groupName must not be null!");
 		}

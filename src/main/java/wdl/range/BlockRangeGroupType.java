@@ -1,24 +1,25 @@
 package wdl.range;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 /**
- * {@link IRangeProducer} that uses chunk positions.
+ * {@link IRangeProducer} that uses block positions.
  */
-public class ChunkRangeProducer implements IRangeProducer {
+public final class BlockRangeGroupType implements
+		IRangeGroupType<SimpleRangeProducer> {
 	@Override
-	public List<ProtectionRange> getRanges(Player player, ConfigurationSection config) {
+	public SimpleRangeProducer createRangeProducer(RangeGroup group,
+			ConfigurationSection config) {
+		String tag = config.getString("tag");
 		boolean whitelist = config.getBoolean("whitelist");
-		int x1 = config.getInt("x1");
-		int z1 = config.getInt("z1");
-		int x2 = config.getInt("x2");
-		int z2 = config.getInt("z2");
+		int x1 = config.getInt("x1") / 16;
+		int z1 = config.getInt("z1") / 16;
+		int x2 = config.getInt("x2") / 16;
+		int z2 = config.getInt("z2") / 16;
 		
-		return Arrays.asList(new ProtectionRange("", whitelist, x1, z1, x2, z2));
+		return new SimpleRangeProducer(group, whitelist, tag, x1, z1, x2, z2);
 	}
 
 	@Override

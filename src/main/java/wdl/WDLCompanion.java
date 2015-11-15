@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -34,10 +35,12 @@ import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
-import wdl.range.BlockRangeProducer;
+import wdl.range.BlockRangeGroupType;
+import wdl.range.IRangeGroupType;
 import wdl.range.ProtectionRange;
-import wdl.range.ChunkRangeProducer;
+import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
+import wdl.range.RangeGroup;
 
 /**
  * Very simple WDL companion plugin.
@@ -72,9 +75,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private BookCreator bookCreator;
 	
 	/**
-	 * List of all registered {@link IRangeProducer}s.
+	 * Map of all registered {@link IRangeGroupType}s by their IDs.
 	 */
-	Map<String, IRangeProducer> rangeProducers = new HashMap<>();
+	final Map<String, IRangeGroupType<?>> registeredRangeGroupTypes = new HashMap<>();
+	/**
+	 * Map of all registered {@link IRangeProducer}s by their IDs.
+	 */
+	private final Map<String, IRangeProducer> rangeProducers = new HashMap<>();
 	
 	@Override
 	public void onLoad() {
@@ -219,13 +226,43 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		getServer().getScheduler().runTaskLater(this, new Runnable() {
 			@Override
 			public void run() {
-				getServer().getPluginManager().callEvent(
-						new RangeProducerRegistrationEvent(WDLCompanion.this));
+				registeredRangeGroupTypes.clear();
+				RangeGroupTypeRegistrationEvent event =
+						new RangeGroupTypeRegistrationEvent(WDLCompanion.this);
+				getServer().getPluginManager().callEvent(event);
+				event.markFinished();
 				
-				// Warn about incorrect config setup.
-				// Using the console sender because it supports coloration. 
+				// Warn about incorrect any incorrect config setup.
+				// Using the console sender because it supports coloration.
+				// We do this now so that the group types have registered.
 				ConfigValidation.validateConfig(getConfig(), getServer()
 						.getConsoleSender(), WDLCompanion.this);
+				
+				// OK, now create the range producers.
+				rangeProducers.clear();
+				ConfigurationSection overrides = getConfig()
+						.getConfigurationSection("wdl.chunkOverrides");
+				Set<String> keys = overrides.getKeys(false);
+				for (String key : keys) {
+					ConfigurationSection override = overrides
+							.getConfigurationSection(key);
+					
+					IRangeGroupType<?> type = registeredRangeGroupTypes
+							.get(override.getString("type"));
+					
+					if (type == null) {
+						throw new AssertionError("Failed to get the group "
+								+ "type for ChunkOverride" + key + "!  "
+								+ "Tried to use " + override.getString("type")
+								+ ", but that was not found.");
+					}
+					
+					RangeGroup group = new RangeGroup(key);
+					IRangeProducer producer = type.createRangeProducer(group,
+							override);
+					
+					rangeProducers.put(key, producer);
+				}
 			}
 		}, 1);
 	}
@@ -239,9 +276,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 	
 	@EventHandler
-	public void registerRanges(RangeProducerRegistrationEvent event) {
-		event.addRegistration("BlockRange", new BlockRangeProducer());
-		event.addRegistration("ChunkRange", new ChunkRangeProducer());
+	public void registerRanges(RangeGroupTypeRegistrationEvent event) {
+		event.addRegistration("BlockRange", new BlockRangeGroupType());
+		event.addRegistration("ChunkRange", new ChunkRangeGroupType());
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -615,6 +652,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	/**
 	 * Gets the ranges that apply to the given player.
+	 * TODO: This method probably should be restructured
+	 * to use the tag system and such more cleanly.
 	 * 
 	 * @param player
 	 * @return
@@ -625,12 +664,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		if (!config.isSet("wdl.chunkOverrides")) {
 			return ranges;
 		}
-		ConfigurationSection overrides = config
-				.getConfigurationSection("wdl.chunkOverrides");
-		for (String key : overrides.getKeys(false)) {
-			ConfigurationSection override = overrides.getConfigurationSection(key);
-			IRangeProducer producer = rangeProducers.get(override.getString("type"));
-			ranges.addAll(producer.getRanges(player, override));
+		
+		for (IRangeProducer producer : rangeProducers.values()) {
+			ranges.addAll(producer.getInitialRanges(player));
 		}
 		return ranges;
 	}

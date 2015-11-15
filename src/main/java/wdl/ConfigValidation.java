@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
-import wdl.range.IRangeProducer;
+import wdl.range.IRangeGroupType;
 
 public class ConfigValidation {
 	/**
@@ -372,22 +372,22 @@ public class ConfigValidation {
 					+ "string!  It will be ignored.");
 			 return false;
 		}
-		String type = override.getString("type");
-		if (!plugin.rangeProducers.containsKey(type)) {
+		String typeName = override.getString("type");
+		if (!plugin.registeredRangeGroupTypes.containsKey(typeName)) {
 			 warnTo.sendMessage("§c[WDL] ERROR: 'type' for chunk " 
 						+ "override '" + key + "' is not a valid option!  "
-						+ "Currently '" + type + "', expected one of "
-						+ plugin.rangeProducers.keySet() + ".  " 
+						+ "Currently '" + typeName + "', expected one of "
+						+ plugin.registeredRangeGroupTypes.keySet() + ".  " 
 						+ "It will be ignored.");
 			 return false;
 		}
 		
-		IRangeProducer producer = plugin.rangeProducers.get(type);
+		IRangeGroupType<?> type = plugin.registeredRangeGroupTypes.get(typeName);
 		
 		List<String> warnings = new ArrayList<>();
 		List<String> errors = new ArrayList<>();
 		
-		if (!producer.isValidConfig(override, warnings, errors)) {
+		if (!type.isValidConfig(override, warnings, errors)) {
 			for (String s : warnings) {
 				warnTo.sendMessage("§e[WDL] WARNING: " + s);
 			}
