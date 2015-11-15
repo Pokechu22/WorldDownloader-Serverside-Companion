@@ -387,16 +387,17 @@ public class ConfigValidation {
 		List<String> warnings = new ArrayList<>();
 		List<String> errors = new ArrayList<>();
 		
-		if (!type.isValidConfig(override, warnings, errors)) {
-			for (String s : warnings) {
-				warnTo.sendMessage("§e[WDL] WARNING: " + s);
-			}
-			for (String s : errors) {
-				warnTo.sendMessage("§c[WDL] ERROR: " + s);
-			}
+		boolean valid = type.isValidConfig(override, warnings, errors);
+		for (String s : warnings) {
+			warnTo.sendMessage("§e[WDL] WARNING: " + s);
+		}
+		for (String s : errors) {
+			warnTo.sendMessage("§c[WDL] ERROR: " + s);
+		}
+		if (!valid) {
 			warnTo.sendMessage("§c[WDL] ERROR: Config for chunk " 
-					+ "override '" + key + "' is fatally incorrect!  "
-					+ "It will be ignored.");
+				+ "override '" + key + "' is fatally incorrect!  "
+				+ "It will be ignored.");
 			return false;
 		}
 		return true;
