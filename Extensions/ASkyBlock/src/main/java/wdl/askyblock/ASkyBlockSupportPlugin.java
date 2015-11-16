@@ -11,7 +11,7 @@ import wdl.RangeGroupTypeRegistrationEvent;
  * 
  * @see https://github.com/tastybento/askyblock
  */
-public class ASkyblockSupportPlugin extends JavaPlugin implements Listener {
+public class ASkyBlockSupportPlugin extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
