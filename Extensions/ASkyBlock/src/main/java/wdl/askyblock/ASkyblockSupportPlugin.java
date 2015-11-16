@@ -19,6 +19,6 @@ public class ASkyblockSupportPlugin extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void registerRangeGroupTypes(RangeGroupTypeRegistrationEvent e) {
-		e.addRegistration("ASkyBlock island", new ASkyBlockRangeGroupType());
+		e.addRegistration("ASkyBlock island", new ASkyBlockRangeGroupType(this));
 	}
 }

@@ -7,10 +7,15 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import com.wasteofplastic.askyblock.Settings;
+import com.wasteofplastic.askyblock.events.IslandJoinEvent;
+import com.wasteofplastic.askyblock.events.IslandLeaveEvent;
+import com.wasteofplastic.askyblock.events.IslandNewEvent;
+import com.wasteofplastic.askyblock.events.IslandResetEvent;
 
 import wdl.range.IRangeGroup;
 import wdl.range.IRangeProducer;
@@ -50,6 +55,55 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	@Override
 	public IRangeGroup getRangeGroup() {
 		return group;
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires an {@link IslandLeaveEvent}: a player has
+	 * left an island team.
+	 */
+	@EventHandler
+	public void onLeaveIsland(IslandLeaveEvent e) {
+		Player player = Bukkit.getPlayer(e.getPlayer());
+		group.removeRangesByTags(player, getIslandTag(e.getTeamLeader()));
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires an {@link IslandJoinEvent}: a player has
+	 * joined an island team.
+	 */
+	@EventHandler
+	public void onJoinIsland(IslandJoinEvent e) {
+		Player player = Bukkit.getPlayer(e.getPlayer());
+		
+		String tag = getIslandTag(e.getTeamLeader());
+		ProtectionRange range = getProtectionRangeForIsland(e.getIslandLocation(), e.getProtectionSize());
+		
+		group.setTagRanges(player, tag, range);
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires an {@link IslandNewEvent}: a player has
+	 * created a new island.
+	 */
+	@EventHandler
+	public void onNewIsland(IslandNewEvent e) {
+		ProtectionRange range = getProtectionRangeForIsland(
+				e.getIslandLocation(), e.getProtectionSize());
+		
+		group.addRanges(e.getPlayer(), range);
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires an {@link IslandResetEvent}: a player has
+	 * reset their island.
+	 */
+	@EventHandler
+	public void onResetIsland(IslandResetEvent e) {
+		Player player = e.getPlayer();
+		
+		String tag = player.getName() + "'s island";
+		
+		group.removeRangesByTags(player, tag);
 	}
 	
 	/**

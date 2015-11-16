@@ -3,17 +3,27 @@ package wdl.askyblock;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.Plugin;
 
 import wdl.range.IRangeGroup;
 import wdl.range.IRangeGroupType;
 
 public class ASkyBlockRangeGroupType implements
 		IRangeGroupType<ASkyBlockRangeProducer> {
+	private final Plugin plugin;
+
+	public ASkyBlockRangeGroupType(Plugin plugin) {
+		this.plugin = plugin;
+	}
+	
 	@Override
 	public ASkyBlockRangeProducer createRangeProducer(IRangeGroup group,
 			ConfigurationSection config) {
 		PermLevel level = PermLevel.parse(config.getString("requiredPerm"));
-		return new ASkyBlockRangeProducer(group, level);
+		ASkyBlockRangeProducer producer = new ASkyBlockRangeProducer(group, level);
+		plugin.getServer().getPluginManager().registerEvents(producer, plugin);
+		
+		return producer;
 	}
 
 	@Override
