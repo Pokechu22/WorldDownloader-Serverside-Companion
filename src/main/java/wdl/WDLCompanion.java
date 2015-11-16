@@ -239,30 +239,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						.getConsoleSender(), WDLCompanion.this);
 				
 				// OK, now create the range producers.
-				rangeProducers.clear();
-				ConfigurationSection overrides = getConfig()
-						.getConfigurationSection("wdl.chunkOverrides");
-				Set<String> keys = overrides.getKeys(false);
-				for (String key : keys) {
-					ConfigurationSection override = overrides
-							.getConfigurationSection(key);
-					
-					IRangeGroupType<?> type = registeredRangeGroupTypes
-							.get(override.getString("type"));
-					
-					if (type == null) {
-						throw new AssertionError("Failed to get the group "
-								+ "type for ChunkOverride" + key + "!  "
-								+ "Tried to use " + override.getString("type")
-								+ ", but that was not found.");
-					}
-					
-					IRangeGroup group = new RangeGroup(key, WDLCompanion.this);
-					IRangeProducer producer = type.createRangeProducer(group,
-							override);
-					
-					rangeProducers.put(key, producer);
-				}
+				createRangeProducers();
 			}
 		}, 1);
 	}
@@ -325,6 +302,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				
 				reloadConfig();
 				ConfigValidation.validateConfig(getConfig(), sender, this);
+				createRangeProducers();
 				
 				updateAllPlayers();
 				
@@ -445,6 +423,36 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		}
 	}
 
+	/**
+	 * Recreate the {@link #rangeProducers} list.
+	 */
+	private void createRangeProducers() {
+		rangeProducers.clear();
+		ConfigurationSection overrides = getConfig()
+				.getConfigurationSection("wdl.chunkOverrides");
+		Set<String> keys = overrides.getKeys(false);
+		for (String key : keys) {
+			ConfigurationSection override = overrides
+					.getConfigurationSection(key);
+			
+			IRangeGroupType<?> type = registeredRangeGroupTypes
+					.get(override.getString("type"));
+			
+			if (type == null) {
+				throw new AssertionError("Failed to get the group "
+						+ "type for ChunkOverride" + key + "!  "
+						+ "Tried to use " + override.getString("type")
+						+ ", but that was not found.");
+			}
+			
+			IRangeGroup group = new RangeGroup(key, WDLCompanion.this);
+			IRangeProducer producer = type.createRangeProducer(group,
+					override);
+			
+			rangeProducers.put(key, producer);
+		}
+	}
+	
 	/**
 	 * Gets the download radius a player has, based off of their permissions and
 	 * the <code>saveRadius</code> value in the config file.
