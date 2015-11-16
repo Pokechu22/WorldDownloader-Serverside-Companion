@@ -12,7 +12,8 @@ public class ASkyBlockRangeGroupType implements
 	@Override
 	public ASkyBlockRangeProducer createRangeProducer(IRangeGroup group,
 			ConfigurationSection config) {
-		return null;
+		PermLevel level = PermLevel.parse(config.getString("requiredPerm"));
+		return new ASkyBlockRangeProducer(group, level);
 	}
 
 	@Override
