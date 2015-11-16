@@ -36,9 +36,11 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 		ArrayList<ProtectionRange> ranges = new ArrayList<>();
 		
 		if (player.getWorld().equals(api.getIslandWorld())) {
-			UUID playerID = player.getUniqueId();
-			if (api.hasIsland(playerID) || api.inTeam(playerID)) {
-				ranges.add(getProtectionRangeForPlayerIsland(playerID));
+			List<Location> locations = getIslandsFor(player.getUniqueId());
+			int protectionRange = Settings.island_protectionRange;
+			
+			for (Location location : locations) {
+				ranges.add(getProtectionRangeForIsland(location, protectionRange));
 			}
 		}
 		
@@ -51,14 +53,30 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	}
 	
 	/**
-	 * Gets a {@link ProtectionRange} for the island owned by the player with the
-	 * given {@link UUID unique ID}.
+	 * Gets the locations for all islands useable by the given player.
+	 * Owned is defined as accessible under {@link #requiredPerm}.
+	 * 
+	 * @param playerID The unique ID of the player.
+	 * @return A list of all islands the player can use. 
 	 */
-	private ProtectionRange getProtectionRangeForPlayerIsland(UUID playerID) {
-		Location islandLoc = api.getIslandLocation(playerID);
-		int protectionRange = Settings.island_protectionRange;
+	private List<Location> getIslandsFor(UUID playerID) {
+		List<Location> returned = new ArrayList<>();
 		
-		return getProtectionRangeForIsland(islandLoc, protectionRange);
+		Location islandLoc = api.getIslandLocation(playerID);
+		if (requiredPerm == PermLevel.OWNER) {
+			if (api.hasIsland(playerID)) {
+				// Island must be owned by that player.
+				returned.add(islandLoc);
+			}
+		} else {
+			returned.add(islandLoc);
+		}
+		
+		if (requiredPerm == PermLevel.COOP) {
+			returned.addAll(api.getCoopIslands(Bukkit.getPlayer(playerID)));
+		}
+		
+		return returned;
 	}
 	
 	/**
