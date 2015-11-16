@@ -35,6 +35,13 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+            <groupId>pokechu22.plugins</groupId>
+            <artifactId>WDLCompanion</artifactId>
+            <version>1.0.4</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
             <groupId>com.wasteofplastic</groupId>
             <artifactId>askyblock</artifactId>
             <version>2.9.7.4 <!-- Will actually be higher, but this is the current existing version --></version>

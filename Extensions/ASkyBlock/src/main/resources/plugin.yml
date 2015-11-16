@@ -1,0 +1,8 @@
+name: ASkyBlock_support_for_WDLCompanion
+main: wdl.askyblock.ASkyBlockSupportPlugin
+version: 1.0.0
+author: Pokechu22
+depend: [WDLCompanion, ASkyBlock]
+description: |
+  Adds a new Chunk Override type, 'ASkyBlock island', which allows a player to
+  use WorldDownloader on their own island.
