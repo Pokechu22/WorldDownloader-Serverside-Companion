@@ -117,13 +117,15 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 		List<Location> returned = new ArrayList<>();
 		
 		Location islandLoc = api.getIslandLocation(playerID);
-		if (requiredPerm == PermLevel.OWNER) {
-			if (api.hasIsland(playerID)) {
-				// Island must be owned by that player.
+		if (islandLoc != null) {
+			if (requiredPerm == PermLevel.OWNER) {
+				if (api.hasIsland(playerID)) {
+					// Island must be owned by that player.
+					returned.add(islandLoc);
+				}
+			} else {
 				returned.add(islandLoc);
 			}
-		} else {
-			returned.add(islandLoc);
 		}
 		
 		if (requiredPerm == PermLevel.COOP) {
