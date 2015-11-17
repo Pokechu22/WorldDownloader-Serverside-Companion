@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import com.wasteofplastic.askyblock.Settings;
+import com.wasteofplastic.askyblock.events.CoopJoinEvent;
+import com.wasteofplastic.askyblock.events.CoopLeaveEvent;
 import com.wasteofplastic.askyblock.events.IslandJoinEvent;
 import com.wasteofplastic.askyblock.events.IslandLeaveEvent;
 import com.wasteofplastic.askyblock.events.IslandNewEvent;
@@ -62,8 +64,10 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	 */
 	@EventHandler
 	public void onLeaveIsland(IslandLeaveEvent e) {
-		Player player = Bukkit.getPlayer(e.getPlayer());
-		group.removeRangesByTags(player, getIslandTag(e.getTeamLeader()));
+		if (requiredPerm != PermLevel.OWNER) {
+			Player player = Bukkit.getPlayer(e.getPlayer());
+			group.removeRangesByTags(player, getIslandTag(e.getTeamLeader()));
+		}
 	}
 	
 	/**
@@ -72,12 +76,15 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	 */
 	@EventHandler
 	public void onJoinIsland(IslandJoinEvent e) {
-		Player player = Bukkit.getPlayer(e.getPlayer());
-		
-		String tag = getIslandTag(e.getTeamLeader());
-		ProtectionRange range = getProtectionRangeForIsland(e.getIslandLocation(), e.getProtectionSize());
-		
-		group.setTagRanges(player, tag, range);
+		if (requiredPerm != PermLevel.OWNER) {
+			Player player = Bukkit.getPlayer(e.getPlayer());
+
+			String tag = getIslandTag(e.getTeamLeader());
+			ProtectionRange range = getProtectionRangeForIsland(
+					e.getIslandLocation(), e.getProtectionSize());
+
+			group.setTagRanges(player, tag, range);
+		}
 	}
 	
 	/**
@@ -92,6 +99,36 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 				e.getIslandLocation(), e.getProtectionSize());
 		
 		group.setTagRanges(player, player.getName() + "'s island", range);
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires a {@link CoopJoinEvent}: A player has
+	 * joined another player's coop team.
+	 */
+	@EventHandler
+	public void onCoopJoin(CoopJoinEvent e) {
+		if (requiredPerm == PermLevel.COOP) {
+			Player player = Bukkit.getPlayer(e.getPlayer());
+			
+			String tag = getIslandTag(e.getTeamLeader());
+			ProtectionRange range = getProtectionRangeForIsland(
+					e.getIslandLocation(), e.getProtectionSize());
+			
+			group.setTagRanges(player, tag, range);
+		}
+	}
+	
+	/**
+	 * Occurs when ASkyBlock fires a {@link CoopLeaveEvent}: A player has
+	 * left another player's coop team.
+	 */
+	@EventHandler
+	public void onCoopLeave(CoopLeaveEvent e) {
+		if (requiredPerm == PermLevel.COOP) {
+			Player player = Bukkit.getPlayer(e.getPlayer());
+			
+			group.removeRangesByTags(player, getIslandTag(e.getIslandOwner()));
+		}
 	}
 	
 	/**
@@ -122,6 +159,8 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 		
 		return returned;
 	}
+	
+	
 	
 	/**
 	 * Gets a {@link ProtectionRange} for the island at the given position.
