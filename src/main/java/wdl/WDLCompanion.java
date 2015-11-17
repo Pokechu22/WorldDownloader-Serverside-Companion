@@ -754,6 +754,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 										WDLCompanion.this, packet.channel,
 										packet.data);
 							}
+							
+							packetsToSend.clear();
 						}
 					}
 				});
