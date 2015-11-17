@@ -15,7 +15,6 @@ import com.wasteofplastic.askyblock.Settings;
 import com.wasteofplastic.askyblock.events.IslandJoinEvent;
 import com.wasteofplastic.askyblock.events.IslandLeaveEvent;
 import com.wasteofplastic.askyblock.events.IslandNewEvent;
-import com.wasteofplastic.askyblock.events.IslandResetEvent;
 
 import wdl.range.IRangeGroup;
 import wdl.range.IRangeProducer;
@@ -87,23 +86,12 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	 */
 	@EventHandler
 	public void onNewIsland(IslandNewEvent e) {
+		Player player = e.getPlayer();
+		
 		ProtectionRange range = getProtectionRangeForIsland(
 				e.getIslandLocation(), e.getProtectionSize());
 		
-		group.addRanges(e.getPlayer(), range);
-	}
-	
-	/**
-	 * Occurs when ASkyBlock fires an {@link IslandResetEvent}: a player has
-	 * reset their island.
-	 */
-	@EventHandler
-	public void onResetIsland(IslandResetEvent e) {
-		Player player = e.getPlayer();
-		
-		String tag = player.getName() + "'s island";
-		
-		group.removeRangesByTags(player, tag);
+		group.setTagRanges(player, player.getName() + "'s island", range);
 	}
 	
 	/**
