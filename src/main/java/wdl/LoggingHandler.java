@@ -65,7 +65,7 @@ public class LoggingHandler {
 				"[%d{HH:mm:ss}] [%t/%level]: %msg%n", null, null, null, null);
 		
 		Filter filter = RegexFilter.createFilter(
-				"[\\s\\S]*\\[WDL(?:Companion)?\\][\\s\\S]*", "false",
+				"[\\s\\S]*\\[WDL[\\s\\S]*\\][\\s\\S]*", "false",
 				"ACCEPT", "DENY");
 		
 		if (mode.equalsIgnoreCase("individual")) {
