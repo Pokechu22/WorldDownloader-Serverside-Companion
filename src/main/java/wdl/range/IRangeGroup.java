@@ -29,6 +29,8 @@ public interface IRangeGroup {
 	 * @throws IllegalArgumentException
 	 *             If player is null.
 	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
+	 * @throws IllegalArgumentException
 	 *             If ranges is null, or any value in ranges is null.
 	 */
 	public abstract void addRanges(Player player, ProtectionRange... ranges);
@@ -44,6 +46,8 @@ public interface IRangeGroup {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If player is null.
+	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
 	 * @throws IllegalArgumentException
 	 *             If ranges is null, or any value in ranges is null.
 	 */
@@ -61,6 +65,8 @@ public interface IRangeGroup {
 	 * @throws IllegalArgumentException
 	 *             If player is null.
 	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
+	 * @throws IllegalArgumentException
 	 *             If ranges is null, or any value in ranges is null.
 	 */
 	public abstract void setRanges(Player player, ProtectionRange... ranges);
@@ -76,6 +82,8 @@ public interface IRangeGroup {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If player is null.
+	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
 	 * @throws IllegalArgumentException
 	 *             If ranges is null, or any value in ranges is null.
 	 */
@@ -93,6 +101,8 @@ public interface IRangeGroup {
 	 * @throws IllegalArgumentException
 	 *             If player is null.
 	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
+	 * @throws IllegalArgumentException
 	 *             If tags is null, or any value in tags is null.
 	 */
 	public abstract void removeRangesByTags(Player player, String... tags);
@@ -108,6 +118,8 @@ public interface IRangeGroup {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If player is null.
+	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
 	 * @throws IllegalArgumentException
 	 *             If tags is null, or any value in tags is null.
 	 */
@@ -127,6 +139,8 @@ public interface IRangeGroup {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If player is null.
+	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
 	 * @throws IllegalArgumentException
 	 *             If tag is null.
 	 * @throws IllegalArgumentException
@@ -151,6 +165,8 @@ public interface IRangeGroup {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             If player is null.
+	 * @throws IllegalArgumentException
+	 *             If player does not have WDL installed.
 	 * @throws IllegalArgumentException
 	 *             If tag is null.
 	 * @throws IllegalArgumentException

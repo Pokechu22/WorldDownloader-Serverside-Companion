@@ -52,6 +52,9 @@ class RangeGroup implements IRangeGroup {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
+		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
 		}
@@ -71,6 +74,9 @@ class RangeGroup implements IRangeGroup {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
+		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
 		}
@@ -88,6 +94,9 @@ class RangeGroup implements IRangeGroup {
 	public void setRanges(Player player, ProtectionRange... ranges) {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
 		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
@@ -108,6 +117,9 @@ class RangeGroup implements IRangeGroup {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
+		}
 		if (ranges == null) {
 			throw new IllegalArgumentException("ranges must not be null!  (group is " + groupName + ")");
 		}
@@ -125,6 +137,9 @@ class RangeGroup implements IRangeGroup {
 	public void removeRangesByTags(Player player, String... tags) {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
 		}
 		if (tags == null) {
 			throw new IllegalArgumentException("tags must not be null!  (group is " + groupName + ")");
@@ -144,6 +159,9 @@ class RangeGroup implements IRangeGroup {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
+		}
 		if (tags == null) {
 			throw new IllegalArgumentException("tags must not be null!  (group is " + groupName + ")");
 		}
@@ -160,6 +178,9 @@ class RangeGroup implements IRangeGroup {
 	public void setTagRanges(Player player, String tag, ProtectionRange... ranges) {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
+		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
 		}
 		if (tag == null) {
 			throw new IllegalArgumentException("tag must not be null!  (group is " + groupName + ")");
@@ -187,6 +208,9 @@ class RangeGroup implements IRangeGroup {
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
+		if (!isWDLPlayer(player)) {
+			throw new IllegalArgumentException("player " + playerToString(player) + " does not have WDL installed! (they aren't listening on the WDL channel)");
+		}
 		if (tag == null) {
 			throw new IllegalArgumentException("tag must not be null!  (group is " + groupName + ")");
 		}
@@ -210,5 +234,14 @@ class RangeGroup implements IRangeGroup {
 	public boolean isWDLPlayer(Player player) {
 		return player.getListeningPluginChannels().contains(
 				WDLCompanion.CONTROL_CHANNEL_NAME);
+	}
+	
+	/**
+	 * Gets a string version of a player for use in exceptions.  This includes
+	 * their UUID, name, and display name.
+	 */
+	private String playerToString(Player player) {
+		return player.getDisplayName() + " (" + player.getName() + " / "
+				+ player.getUniqueId() + ")";
 	}
 }
