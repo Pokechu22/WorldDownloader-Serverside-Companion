@@ -1,10 +1,13 @@
 package wdl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import wdl.range.ProtectionRange;
 
+import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
@@ -242,6 +245,33 @@ public class WDLPackets {
 	}
 	
 	/**
+	 * Reads a permission request.
+	 */
+	public static PluginChannelPermissionsRequestedEvent readPermissionRequest(byte[] data) {
+		ByteArrayDataInput input = ByteStreams.newDataInput(data);
+		
+		String requestReason = input.readUTF();
+		
+		Map<String, String> requestedPerms = new HashMap<>();
+		int numRequests = input.readInt();
+		for (int i = 0; i < numRequests; i++) {
+			String key = input.readUTF();
+			String value = input.readUTF();
+			
+			requestedPerms.put(key, value);
+		}
+		
+		List<ProtectionRange> rangeRequests = new ArrayList<>();
+		int numRangeRequests = input.readInt();
+		for (int i = 0; i < numRangeRequests; i++) {
+			rangeRequests.add(readProtectionRange(input));
+		}
+		
+		return new PluginChannelPermissionsRequestedEvent(requestReason,
+				requestedPerms, rangeRequests);
+	}
+	
+	/**
 	 * Writes a protection range to the given output stream.
 	 * 
 	 * This is a string with the range's tag, then 4 integers for the
@@ -268,6 +298,35 @@ public class WDLPackets {
 		output.writeInt(z1);
 		output.writeInt(x2);
 		output.writeInt(z2);
+	}
+	
+	/**
+	 * Reads a protection range from the given input stream.
+	 * 
+	 * This is a string with the range's tag, then 4 integers for the
+	 * coordinates (x1, z1, x2, z2). This method also swaps x1 and x2 if x1 is
+	 * greater than x2.
+	 */
+	private static ProtectionRange readProtectionRange(ByteArrayDataInput input) {
+		String tag = input.readUTF();
+		
+		int x1 = input.readInt();
+		int z1 = input.readInt();
+		int x2 = input.readInt();
+		int z2 = input.readInt();
+		
+		if (x1 > x2) {
+			int temp = x2;
+			x2 = x1;
+			x1 = temp;
+		}
+		if (z1 > z2) {
+			int temp = z2;
+			z2 = z1;
+			z1 = temp;
+		}
+		
+		return new ProtectionRange(tag, x1, z1, x2, z2);
 	}
 }
 
