@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.entity.Player;
+
 import wdl.range.ProtectionRange;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -247,7 +249,8 @@ public class WDLPackets {
 	/**
 	 * Reads a permission request.
 	 */
-	public static PluginChannelPermissionsRequestedEvent readPermissionRequest(byte[] data) {
+	public static PluginChannelPermissionsRequestedEvent readPermissionRequest(
+			Player player, byte[] data) {
 		ByteArrayDataInput input = ByteStreams.newDataInput(data);
 		
 		String requestReason = input.readUTF();
@@ -267,8 +270,8 @@ public class WDLPackets {
 			rangeRequests.add(readProtectionRange(input));
 		}
 		
-		return new PluginChannelPermissionsRequestedEvent(requestReason,
-				requestedPerms, rangeRequests);
+		return new PluginChannelPermissionsRequestedEvent(player,
+				requestReason, requestedPerms, rangeRequests);
 	}
 	
 	/**

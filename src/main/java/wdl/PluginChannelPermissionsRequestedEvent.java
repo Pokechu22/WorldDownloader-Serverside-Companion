@@ -3,6 +3,8 @@ package wdl;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
 import wdl.range.ProtectionRange;
@@ -12,14 +14,16 @@ import wdl.range.ProtectionRange;
  */
 public class PluginChannelPermissionsRequestedEvent extends
 		PermissionsRequestedEvent {
-	public PluginChannelPermissionsRequestedEvent(String requestReason,
-			Map<String, String> requestedPerms,
+	private final Player player;
+	
+	public PluginChannelPermissionsRequestedEvent(Player player,
+			String requestReason, Map<String, String> requestedPerms,
 			List<ProtectionRange> rangeRequests) {
 		super(requestReason, requestedPerms, rangeRequests);
+		
+		this.player = player;
 	}
 
-	//TODO: Put in the custom logic here.
-	
 	private static final HandlerList handlers = new HandlerList();
 	
 	@Override
@@ -29,5 +33,23 @@ public class PluginChannelPermissionsRequestedEvent extends
 	
 	public static HandlerList getHandlerList() {
 		return handlers;
+	}
+
+	@Override
+	public String getLocationInfo() {
+		Location loc = player.getLocation();
+		return "In world " + loc.getWorld().getName() + " at "
+				+ loc.getBlockX() + ", " + loc.getBlockY() + ", "
+				+ loc.getBlockZ();
+	}
+
+	@Override
+	public String getPlayerInfo() {
+		return player.getCustomName() + " (" + player.getName() + ")";
+	}
+
+	@Override
+	public String getTeleportCommand() {
+		return "/tp " + player.getName();
 	}
 }

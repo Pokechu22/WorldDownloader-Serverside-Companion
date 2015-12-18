@@ -48,4 +48,29 @@ public abstract class PermissionsRequestedEvent extends Event {
 	public List<ProtectionRange> getRangeRequests() {
 		return rangeRequests;
 	}
+	
+	/**
+	 * Gets information about the location of the player requesting permissions.
+	 * 
+	 * For example, this might be "In world 'World' at 25 64 492", or
+	 * "On server 'minigame3241' in world 'World_the_end' at 42 -32 12".
+	 * 
+	 * This information is displayed to the user.
+	 */
+	public abstract String getLocationInfo();
+	
+	/**
+	 * Gets some information about the player requesting permissions.
+	 * 
+	 * For instance, this might be "§9[Skylord]§aDashbar §r(dashbar)" - IE,
+	 * using the display name and text name.
+	 */
+	public abstract String getPlayerInfo();
+	
+	/**
+	 * Gets the text for a command an admin can execute to get to the player
+	 * requesting permissions. For instance, this might be "/tp [playername]" or
+	 * "/server minigame3241".
+	 */
+	public abstract String getTeleportCommand();
 }
