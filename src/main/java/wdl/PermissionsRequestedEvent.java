@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 import wdl.range.ProtectionRange;
 
@@ -47,6 +48,17 @@ public abstract class PermissionsRequestedEvent extends Event {
 	 */
 	public List<ProtectionRange> getRangeRequests() {
 		return rangeRequests;
+	}
+	
+	private static final HandlerList handlers = new HandlerList();
+	
+	@Override
+	public final HandlerList getHandlers() {
+		return handlers;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return handlers;
 	}
 	
 	/**
