@@ -54,7 +54,8 @@ import wdl.range.IRangeProducer;
  */
 public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageListener {
 	/**
-	 * The name of the plugin channel sent by WDL to request permissions.
+	 * The name of the plugin channel sent by WDL to signify that it is ready to
+	 * receive permissions.
 	 */
 	public static final String INIT_CHANNEL_NAME = "WDL|INIT";
 	
@@ -62,6 +63,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * The name of the plugin channel used for WDL control.
 	 */
 	public static final String CONTROL_CHANNEL_NAME = "WDL|CONTROL";
+	
+	/**
+	 * The name of the plugin channel used by WDL to request new permissions.
+	 */
+	public static final String REQUEST_CHANNEL_NAME = "WDL|REQUEST";
 
 	/**
 	 * Cached entity ranges.
@@ -99,6 +105,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 
 		this.getServer().getMessenger()
 				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME, this);
+		this.getServer().getMessenger()
+				.registerIncomingPluginChannel(this, REQUEST_CHANNEL_NAME, this);
 		this.getServer().getMessenger()
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 		this.getServer().getPluginManager().registerEvents(this, this);
@@ -421,6 +429,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			
 			updatePlayer(player);
 		}
+		
+		if (channel.equals(REQUEST_CHANNEL_NAME)) {
+			PermissionsRequestedEvent event = WDLPackets.readPermissionRequest(
+					player, data);
+			
+			Bukkit.getPluginManager().callEvent(event);
+		}
 	}
 
 	/**
@@ -718,6 +733,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;
+	}
+	
+	@EventHandler
+	public void onPermissionsRequested(PermissionsRequestedEvent e) {
+		getLogger().info(e.toString() + ": " + e.getPlayerInfo() + " "
+						+ e.getLocationInfo() + " " + e.getTeleportCommand()
+						+ " " + e.getRequestReason() + " "
+						+ e.getRequestedPermissions() + " "
+						+ e.getRangeRequests());
 	}
 	
 	/**
