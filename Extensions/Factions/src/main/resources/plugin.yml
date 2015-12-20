@@ -1,0 +1,10 @@
+name: Factions_support_for_WDLCompanion
+main: wdl.factions.FactionsSupportPlugin
+version: 1.0.0
+author: Pokechu22
+depend: [WDLCompanion, Factions]
+description: |
+  Adds 2 new ChunkOverride types, 'Owned faction' and 'Nearby factions', which
+  allow a player to download in their own faction or nearby factions they have
+  permission in.  Also defines some user-toggleable permissions so that each
+  faction can choose who can download.
