@@ -31,6 +31,15 @@ import com.massivecraft.factions.event.EventFactionsMembershipChange;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.MUtil;
 
+/**
+ * {@link IRangeProducer} that gives information on the <i>nearby</i> factions,
+ * similar to <code>/f map</code>.
+ * 
+ * The reason it needs to work off of nearby factions is that the world is big.
+ * If all factions were sent at once, that would be a lot of data.
+ * Right now, it does send a lot of data, but that will be improved when range
+ * compacting is fixed.
+ */
 public class NearbyFactionsRangeProducer extends BukkitRunnable implements
 		IRangeProducer, Listener {
 	private final FactionsSupportPlugin plugin;
@@ -65,17 +74,20 @@ public class NearbyFactionsRangeProducer extends BukkitRunnable implements
 	}
 	
 	/**
-	 * Called each tick; try to empty out playersNeedingUpdating.
+	 * Called each tick; try to empty out {@link #playersNeedingUpdating}.
 	 */
 	@Override
 	public void run() {
 		for (UUID uuid : playersNeedingUpdating) {
 			Player player = Bukkit.getPlayer(uuid);
-			
-			Map<PS, Faction> chunkMap = getNearbyChunks(player, trackDistance);
-			List<ProtectionRange> ranges = convertChunkMapToRanges(player, chunkMap);
-			
-			rangeGroup.setRanges(player, ranges);
+			if (player != null && rangeGroup.isWDLPlayer(player)) {
+				Map<PS, Faction> chunkMap = getNearbyChunks(player,
+						trackDistance);
+				List<ProtectionRange> ranges = convertChunkMapToRanges(player,
+						chunkMap);
+
+				rangeGroup.setRanges(player, ranges);
+			}
 		}
 		
 		playersNeedingUpdating.clear();
