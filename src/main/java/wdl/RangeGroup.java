@@ -365,8 +365,8 @@ class RangeGroup implements IRangeGroup {
 			boolean inRectangle = false;
 			
 			// Horizontal groups first.
-			for (int z = lowestZ; z < highestZ; z++) {
-				for (int x = lowestX; x < highestX; x++) {
+			for (int z = lowestZ; z <= highestZ; z++) {
+				for (int x = lowestX; x <= highestX; x++) {
 					Point point = new Point(x, z);
 					
 					if (rangesByLocation.containsKey(point)) {
@@ -411,8 +411,8 @@ class RangeGroup implements IRangeGroup {
 			}
 			
 			// Now do vertical groups.
-			for (int x = lowestX; x < highestX; x++) {
-				for (int z = lowestZ; z < highestZ; z++) {
+			for (int x = lowestX; x <= highestX; x++) {
+				for (int z = lowestZ; z <= highestZ; z++) {
 					Point point = new Point(x, z);
 					
 					if (rangesByLocation.containsKey(point)) {
@@ -455,6 +455,9 @@ class RangeGroup implements IRangeGroup {
 					inRectangle = false;
 				}
 			}
+			
+			//Add the remaining single ranges.
+			newRanges.addAll(rangesByLocation.values());
 			
 			finalRanges.addAll(newRanges);
 		}
