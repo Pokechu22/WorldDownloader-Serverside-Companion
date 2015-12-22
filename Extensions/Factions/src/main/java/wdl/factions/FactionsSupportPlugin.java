@@ -29,6 +29,7 @@ public class FactionsSupportPlugin extends JavaPlugin implements Listener {
 	@EventHandler
 	public void registerRangeGroupTypes(RangeGroupTypeRegistrationEvent e) {
 		e.addRegistration("Owned faction", new MyFactionRangeGroupType(this));
+		e.addRegistration("Nearby factions", new NearbyFactionsRangeGroupType(this));
 	}
 	
 	/**
