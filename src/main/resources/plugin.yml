@@ -3,6 +3,7 @@ main: wdl.WDLCompanion
 version: 1.0.4
 author: Pokechu22
 website: https://github.com/Pokechu22/WorldDownloader-Serverside-Companion
+softdepend: [Vault]
 description: |
   This plugin provides a set of permissions that control what WorldDownloader
   (a mod that downloads a Minecraft world on a server; also known as WDL) may
