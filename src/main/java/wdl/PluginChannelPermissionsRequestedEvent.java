@@ -40,4 +40,9 @@ public class PluginChannelPermissionsRequestedEvent extends
 	public String getTeleportCommand() {
 		return "/tp " + player.getName();
 	}
+	
+	@Override
+	public boolean shouldForward() {
+		return true;
+	}
 }

@@ -20,6 +20,15 @@ public abstract class PermissionsRequestedEvent extends Event {
 	protected PermissionsRequestedEvent(String requestReason,
 			Map<String, String> requestedPerms,
 			List<ProtectionRange> rangeRequests) {
+		if (requestReason == null) {
+			throw new IllegalArgumentException("requestReason must not be null!");
+		}
+		if (requestedPerms == null) {
+			throw new IllegalArgumentException("requestedPerms must not be null!");
+		}
+		if (rangeRequests == null) {
+			throw new IllegalArgumentException("rangeRequests must not be null!");
+		}
 		this.requestReason = requestReason;
 		this.requestedPerms = requestedPerms;
 		this.rangeRequests = rangeRequests;
@@ -64,7 +73,7 @@ public abstract class PermissionsRequestedEvent extends Event {
 	/**
 	 * Gets information about the location of the player requesting permissions.
 	 * 
-	 * For example, this might be "In world 'World' at 25 64 492", or
+	 * For example, this might be "un world 'World' at 25 64 492", or
 	 * "On server 'minigame3241' in world 'World_the_end' at 42 -32 12".
 	 * 
 	 * This information is displayed to the user.
@@ -85,4 +94,20 @@ public abstract class PermissionsRequestedEvent extends Event {
 	 * "/server minigame3241".
 	 */
 	public abstract String getTeleportCommand();
+	
+	/**
+	 * Should this event be forwarded to other servers?  Events that were
+	 * triggered on this server should be, but ones that were already
+	 * forwarded (EG with bungeecord) should not be.
+	 */
+	public abstract boolean shouldForward();
+	
+	@Override
+	public String toString() {
+		return getEventName() + ": " + getPlayerInfo() + " "
+				+ getLocationInfo() + " is requesting " + requestedPerms.size()
+				+ " perms and " + rangeRequests.size()
+				+ " chunk overrides (run" + getTeleportCommand()
+				+ " to get to them)";
+	}
 }
