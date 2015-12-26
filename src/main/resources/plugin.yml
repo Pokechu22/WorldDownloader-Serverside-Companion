@@ -16,8 +16,10 @@ commands:
     usage: |
       /<command> updateme -- update your WDL permissions (if the server's ones changed) 
       /<command> reload -- reload the config.
+      /<command> request ... -- request permissions.
       /<command> update <player> -- update a player's WDL permissions.
       /<command> updateall -- update the WDL permissions of all online players.
+      /<command> requests ... -- view and aprove permission requests.
     
 
 permissions:
@@ -34,6 +36,12 @@ permissions:
       different player's permissions.  (Any player can use "/wdl updateme" to
       update their own permissions, even without this permission).  This perm
       also allows access to "/wdl updateall".
+  wdl.handleRequests:
+    default: op
+    description:
+      If a player has this permission, they can use "/wdl requests" to manage
+      permission requests from other players on this server (or, if it is set
+      up, other servers in this bungeecord cluster).
   #Override permissions
   wdl.overrideCanDoNewThings: 
     default: op

@@ -89,6 +89,10 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * Map of all registered {@link IRangeProducer}s by their IDs.
 	 */
 	private final Map<String, IRangeProducer> rangeProducers = new HashMap<>();
+	/**
+	 * List of active requests.
+	 */
+	private final Map<String, PermissionsRequestedEvent> requests = new HashMap<>();
 	
 	@Override
 	public void onLoad() {
@@ -259,6 +263,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getMessenger()
 				.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME);
 		this.getServer().getMessenger()
+				.unregisterIncomingPluginChannel(this, REQUEST_CHANNEL_NAME);
+		this.getServer().getMessenger()
 				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 	}
 	
@@ -367,7 +373,33 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						updatedCount + " players.");
 			}
 			
-			if (args[0].equals("bot")) {
+			if (args[0].equals("requests")) {
+				if (!vaultHandler.hasPermission(sender, "wdl.handleRequests")) {
+					sender.sendMessage("§cYou don't have permission!");
+					return true;
+				}
+				if (args.length == 1) {
+					sender.sendMessage("Usage: ");
+					sender.sendMessage("/wdl requests list -- List all requests.");
+					sender.sendMessage("/wdl requests show <player> -- Show <player>'s request, if present.");
+					sender.sendMessage("/wdl requests approve <player> -- Approve <player>'s request.");
+					sender.sendMessage("/wdl requests reject <player> -- Deny <player>'s request.");
+					return true;
+				}
+				// Aliases
+				if (args[1].equals("aprove")) {
+					args[1] = "approve";
+				}
+				if (args[1].equals("deny")) {
+					args[1] = "reject";
+				}
+				
+				if (args[1].equals("list")) {
+					for (Map.Entry<String, PermissionsRequestedEvent> e : requests.entrySet()) {
+						sender.sendMessage(e.toString());
+					}
+				}
+				
 				bookCreator.openBook((Player)sender, "TEST", args);
 			}
 		}
@@ -749,6 +781,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			getLogger().info(" * " + range.toString());
 		}
 		getLogger().info("Request reason: " + event.getRequestReason());
+		
+		requests.put(event.getPlayerName(), event);
 	}
 	
 	/**
