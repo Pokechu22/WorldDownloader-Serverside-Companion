@@ -32,8 +32,13 @@ public class PluginChannelPermissionsRequestedEvent extends
 	}
 
 	@Override
+	public String getPlayerName() {
+		return player.getName();
+	}
+	
+	@Override
 	public String getPlayerInfo() {
-		return player.getCustomName() + " (" + player.getName() + ")";
+		return player.getDisplayName() + " (" + player.getName() + ")";
 	}
 
 	@Override

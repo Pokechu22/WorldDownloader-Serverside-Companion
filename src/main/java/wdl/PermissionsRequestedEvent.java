@@ -73,12 +73,20 @@ public abstract class PermissionsRequestedEvent extends Event {
 	/**
 	 * Gets information about the location of the player requesting permissions.
 	 * 
-	 * For example, this might be "un world 'World' at 25 64 492", or
+	 * For example, this might be "In world 'World' at 25 64 492", or
 	 * "On server 'minigame3241' in world 'World_the_end' at 42 -32 12".
 	 * 
 	 * This information is displayed to the user.
 	 */
 	public abstract String getLocationInfo();
+	
+	/**
+	 * Gets the EXACT name of the player requesting permissions.
+	 * 
+	 * @return A player name, as would be found via the
+	 *         {@link org.bukkit.entity.Player#getName()} method.
+	 */
+	public abstract String getPlayerName();
 	
 	/**
 	 * Gets some information about the player requesting permissions.
