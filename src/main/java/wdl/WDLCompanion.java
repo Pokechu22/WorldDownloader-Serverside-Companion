@@ -738,12 +738,17 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 	
 	@EventHandler
-	public void onPermissionsRequested(PermissionsRequestedEvent e) {
-		getLogger().info(e.toString() + ": " + e.getPlayerInfo() + " "
-						+ e.getLocationInfo() + " " + e.getTeleportCommand()
-						+ " " + e.getRequestReason() + " "
-						+ e.getRequestedPermissions() + " "
-						+ e.getRangeRequests());
+	public void onPermissionsRequested(PermissionsRequestedEvent event) {
+		getLogger().info("Received request: " + event.toString());
+		getLogger().info("Requested permissions: ");
+		for (Map.Entry<String, String> e : event.getRequestedPermissions().entrySet()) {
+			getLogger().info(" * " + e.getKey() + ": " + e.getValue());
+		}
+		getLogger().info("Range requests: ");
+		for (ProtectionRange range : event.getRangeRequests()) {
+			getLogger().info(" * " + range.toString());
+		}
+		getLogger().info("Request reason: " + event.getRequestReason());
 	}
 	
 	/**

@@ -27,4 +27,10 @@ public final class ProtectionRange {
 	 * (and the same for y).  These are chunk coordinates.
 	 */
 	public final int x1, z1, x2, z2;
+	
+	@Override
+	public String toString() {
+		return "Chunks from (" + x1 + ", " + z1 + ") to (" + x2 + ", " + z2
+				+ ") (tagged " + tag + ")";
+	}
 }
