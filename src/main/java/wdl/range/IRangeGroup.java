@@ -190,4 +190,12 @@ public interface IRangeGroup {
 	 */
 	public abstract boolean isWDLPlayer(Player player);
 
+	/**
+	 * Disposes of this {@link IRangeGroup}.
+	 * 
+	 * Once disposed, this object is not allowed to be used anymore.
+	 * 
+	 * Intended for internal use; don't manually call this.
+	 */
+	public abstract void dispose();
 }

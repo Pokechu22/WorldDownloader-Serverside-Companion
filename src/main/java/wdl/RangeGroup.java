@@ -32,6 +32,11 @@ class RangeGroup implements IRangeGroup {
 	private final WDLCompanion plugin;
 	
 	/**
+	 * Has this RangeGroup been disposed?
+	 */
+	private boolean isDisposed;
+	
+	/**
 	 * Creates a new RangeGroup. Intended for use by the WDLCompanion plugin
 	 * only; this is a wrapper. Others should use {@link IRangeGroupType} /
 	 * {@link IRangeProducer}, which will receive an instance of this class.
@@ -51,11 +56,17 @@ class RangeGroup implements IRangeGroup {
 	
 	@Override
 	public String getGroupName() {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		return groupName;
 	}
 	
 	@Override
 	public void addRanges(Player player, ProtectionRange... ranges) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -77,6 +88,9 @@ class RangeGroup implements IRangeGroup {
 	
 	@Override
 	public void addRanges(Player player, List<ProtectionRange> ranges) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -119,6 +133,9 @@ class RangeGroup implements IRangeGroup {
 	
 	@Override
 	public void setRanges(Player player, List<ProtectionRange> ranges) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -140,6 +157,9 @@ class RangeGroup implements IRangeGroup {
 
 	@Override
 	public void removeRangesByTags(Player player, String... tags) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -161,6 +181,9 @@ class RangeGroup implements IRangeGroup {
 	
 	@Override
 	public void removeRangesByTags(Player player, List<String> tags) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -181,6 +204,9 @@ class RangeGroup implements IRangeGroup {
 
 	@Override
 	public void setTagRanges(Player player, String tag, ProtectionRange... ranges) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -208,6 +234,9 @@ class RangeGroup implements IRangeGroup {
 	
 	@Override
 	public void setTagRanges(Player player, String tag, List<ProtectionRange> ranges) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		if (player == null) {
 			throw new IllegalArgumentException("player must not be null!");
 		}
@@ -235,6 +264,9 @@ class RangeGroup implements IRangeGroup {
 
 	@Override
 	public boolean isWDLPlayer(Player player) {
+		if (this.isDisposed) {
+			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
+		}
 		return player.getListeningPluginChannels().contains(
 				WDLCompanion.CONTROL_CHANNEL_NAME);
 	}
@@ -478,5 +510,10 @@ class RangeGroup implements IRangeGroup {
 	private String playerToString(Player player) {
 		return player.getDisplayName() + " (" + player.getName() + " / "
 				+ player.getUniqueId() + ")";
+	}
+	
+	@Override
+	public void dispose() {
+		this.isDisposed = true;
 	}
 }
