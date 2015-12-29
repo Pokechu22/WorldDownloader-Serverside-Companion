@@ -11,7 +11,7 @@ import wdl.range.IRangeGroupType;
 public class MyFactionRangeGroupType implements IRangeGroupType<MyFactionRangeProducer> {
 	private final FactionsSupportPlugin plugin;
 	
-	public MyFactionRangeGroupType(FactionsSupportPlugin plugin) {
+ 	public MyFactionRangeGroupType(FactionsSupportPlugin plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -29,4 +29,7 @@ public class MyFactionRangeGroupType implements IRangeGroupType<MyFactionRangePr
 			List<String> warnings, List<String> errors) {
 		return true;
 	}
+	
+	@Override
+	public void dispose() { }
 }

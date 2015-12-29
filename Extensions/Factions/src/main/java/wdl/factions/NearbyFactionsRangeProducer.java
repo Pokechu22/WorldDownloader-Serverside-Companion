@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -257,5 +258,12 @@ public class NearbyFactionsRangeProducer extends BukkitRunnable implements
 		}
 		
 		return MPlayer.get(player);
+	}
+	
+	@Override
+	public void dispose() {
+		HandlerList.unregisterAll(this);
+		
+		this.cancel();
 	}
 }

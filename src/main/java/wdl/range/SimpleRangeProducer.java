@@ -78,4 +78,7 @@ public final class SimpleRangeProducer implements IRangeProducer {
 	public IRangeGroup getRangeGroup() {
 		return this.group;
 	}
+	
+	@Override
+	public void dispose() { }
 }

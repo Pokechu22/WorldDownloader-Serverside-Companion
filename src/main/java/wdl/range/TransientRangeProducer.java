@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -82,8 +83,28 @@ public class TransientRangeProducer implements IRangeProducer {
 		rangeGroup.addRanges(player, ranges);
 		
 		// Queue later removal.
-		new RemoveExpiredRangesTask(player, ranges).runTaskLater(owner, ticks);
+		RemoveExpiredRangesTask task = new RemoveExpiredRangesTask(player, ranges);
+		task.runTaskLater(owner, ticks);
+		activeRemovalTasks.add(task);
 	}
+	
+	@Override
+	public void dispose() {
+		for (RemoveExpiredRangesTask task : activeRemovalTasks) {
+			try {
+				task.cancel();
+			} catch (Exception e) {
+				owner.getLogger().log(Level.WARNING,
+						"Failed to cancel task " + task + " while disposing!",
+						e);
+			}
+		}
+	}
+	
+	/**
+	 * List of {@link RemoveExpiredRangesTask}s that are currently running.
+	 */
+	private List<RemoveExpiredRangesTask> activeRemovalTasks = new ArrayList<>();
 	
 	/**
 	 * Task that removes all of the given ranges; can be used to remove ranges
@@ -102,6 +123,8 @@ public class TransientRangeProducer implements IRangeProducer {
 		public void run() {
 			TransientRangeProducer.this.ranges.get(uuid).removeAll(
 					rangesToRemove);
+			// Remove this task from the list of active tasks
+			activeRemovalTasks.remove(this);
 		}
 	}
 }

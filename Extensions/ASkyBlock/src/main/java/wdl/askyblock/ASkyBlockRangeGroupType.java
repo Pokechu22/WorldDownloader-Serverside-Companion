@@ -42,4 +42,9 @@ public class ASkyBlockRangeGroupType implements
 		}
 		return true;
 	}
+	
+	@Override
+	public void dispose() {
+		
+	}
 }

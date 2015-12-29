@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
@@ -190,5 +191,10 @@ public class ASkyBlockRangeProducer implements IRangeProducer, Listener {
 	 */
 	private String getIslandTag(UUID ownerID) {
 		return getPlayerName(ownerID) + "'s island";
+	}
+	
+	@Override
+	public void dispose() {
+		HandlerList.unregisterAll(this);
 	}
 }

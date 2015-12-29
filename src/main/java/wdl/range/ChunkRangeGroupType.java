@@ -63,4 +63,7 @@ public final class ChunkRangeGroupType implements
 		
 		return !hasErrors;
 	}
+	
+	@Override
+	public void dispose() { }
 }

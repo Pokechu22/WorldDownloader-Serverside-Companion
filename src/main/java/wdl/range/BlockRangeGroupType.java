@@ -63,4 +63,7 @@ public final class BlockRangeGroupType implements
 		
 		return !hasErrors;
 	}
+	
+	@Override
+	public void dispose() { }
 }

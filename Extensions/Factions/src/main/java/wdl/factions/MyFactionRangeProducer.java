@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import com.massivecraft.factions.entity.Board;
@@ -234,5 +235,10 @@ public class MyFactionRangeProducer implements IRangeProducer, Listener {
 		}
 		
 		return MPlayer.get(player);
+	}
+	
+	@Override
+	public void dispose() {
+		HandlerList.unregisterAll(this);
 	}
 }

@@ -53,4 +53,6 @@ public class NearbyFactionsRangeGroupType implements IRangeGroupType<NearbyFacti
 		return producer;
 	}
 
+	@Override
+	public void dispose() { }
 }
