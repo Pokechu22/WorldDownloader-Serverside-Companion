@@ -3,6 +3,8 @@ package wdl.range;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 
 /**
  * Something that generates {@link ProtectionRange}s for a player.
@@ -25,4 +27,16 @@ public interface IRangeProducer {
 	 * @return The corresponding {@link IRangeGroup}.
 	 */
 	public abstract IRangeGroup getRangeGroup();
+	
+	/**
+	 * Disposes of this {@link IRangeProducer}. Events should be unregistered,
+	 * etc.
+	 * 
+	 * After this method has been called, this {@link IRangeProducer} instance
+	 * will no longer be used.
+	 * 
+	 * Note: To unregister all events in a {@link Listener}, you can call
+	 * {@link HandlerList#unregisterAll(Listener)}.
+	 */
+	public abstract void dispose();
 }
