@@ -240,6 +240,15 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		getServer().getScheduler().runTaskLater(this, new Runnable() {
 			@Override
 			public void run() {
+				for (IRangeGroupType<?> type : registeredRangeGroupTypes.values()) {
+					try {
+						type.dispose();
+					} catch (Exception e) {
+						getLogger().log(Level.WARNING,
+								"Failed to dispose of old IRangeGroupType " + type
+										+ ": ", e);
+					}
+				}
 				registeredRangeGroupTypes.clear();
 				RangeGroupTypeRegistrationEvent event =
 						new RangeGroupTypeRegistrationEvent(WDLCompanion.this);
@@ -476,6 +485,23 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * Recreate the {@link #rangeProducers} list.
 	 */
 	private void createRangeProducers() {
+		for (IRangeProducer producer : rangeProducers.values()) {
+			try {
+				producer.getRangeGroup().dispose();
+			} catch (Exception e) {
+				getLogger().log(Level.WARNING,
+						"Failed to dispose of old IRangeProducer " + producer
+								+ "'s range group: ", e);
+			}
+			try {
+				producer.dispose();
+			} catch (Exception e) {
+				getLogger().log(Level.WARNING,
+						"Failed to dispose of old IRangeProducer " + producer
+								+ ": ", e);
+			}
+		}
+		
 		rangeProducers.clear();
 		ConfigurationSection overrides = getConfig()
 				.getConfigurationSection("wdl.chunkOverrides");
