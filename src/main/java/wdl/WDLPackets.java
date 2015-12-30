@@ -8,6 +8,7 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import wdl.range.ProtectionRange;
+import wdl.request.PluginChannelPermissionsRequestedEvent;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;

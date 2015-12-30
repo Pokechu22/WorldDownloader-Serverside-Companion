@@ -41,6 +41,7 @@ import wdl.range.IRangeGroupType;
 import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
+import wdl.request.PermissionsRequestedEvent;
 
 /**
  * Very simple WDL companion plugin.
