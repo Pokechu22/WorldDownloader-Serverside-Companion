@@ -55,8 +55,28 @@ public abstract class PermissionsRequestedEvent extends Event {
 	/**
 	 * Gets the list of ProtectionRanges that the player requested.
 	 */
-	public List<ProtectionRange> getRangeRequests() {
+	public final List<ProtectionRange> getRangeRequests() {
 		return rangeRequests;
+	}
+	
+	/**
+	 * Accept this request, firing the needed events and packets.
+	 * 
+	 * This method calls the abstract {@link #doAccept()} method.
+	 */
+	public final void acceptRequest() {
+		doAccept();
+		//TODO: Events, etc...
+	}
+	
+	/**
+	 * Reject this request, firing the needed events and packets.
+	 * 
+	 * This method calls the abstract {@link #doReject()} method.
+	 */
+	public final void rejectRequest() {
+		doReject();
+		//TODO: Events, etc...
 	}
 	
 	private static final HandlerList handlers = new HandlerList();
@@ -71,6 +91,15 @@ public abstract class PermissionsRequestedEvent extends Event {
 	}
 	
 	/**
+	 * Gets the EXACT name of the player requesting permissions.  This
+	 * is used as an ID.
+	 * 
+	 * @return A player name, as would be found via the
+	 *         {@link org.bukkit.entity.Player#getName()} method.
+	 */
+	public abstract String getPlayerName();
+	
+	/**
 	 * Gets information about the location of the player requesting permissions.
 	 * 
 	 * For example, this might be "In world 'World' at 25 64 492", or
@@ -79,14 +108,6 @@ public abstract class PermissionsRequestedEvent extends Event {
 	 * This information is displayed to the user.
 	 */
 	public abstract String getLocationInfo();
-	
-	/**
-	 * Gets the EXACT name of the player requesting permissions.
-	 * 
-	 * @return A player name, as would be found via the
-	 *         {@link org.bukkit.entity.Player#getName()} method.
-	 */
-	public abstract String getPlayerName();
 	
 	/**
 	 * Gets some information about the player requesting permissions.
@@ -104,11 +125,27 @@ public abstract class PermissionsRequestedEvent extends Event {
 	public abstract String getTeleportCommand();
 	
 	/**
-	 * Should this event be forwarded to other servers?  Events that were
-	 * triggered on this server should be, but ones that were already
-	 * forwarded (EG with bungeecord) should not be.
+	 * Has this event been forwarded from another server?  Events that were
+	 * triggered on this server are not; events that were received from
+	 * another server are (EG with bungeecord).
+	 * 
+	 * The return value of this method is used to determine if the event
+	 * should be forwarded again; incorrect values may result in an infinite
+	 * loop.
 	 */
-	public abstract boolean shouldForward();
+	public abstract boolean isForwarded();
+	
+	/**
+	 * Internally accept the event; this involves sending the needed
+	 * packets or such.
+	 */
+	protected abstract void doAccept();
+	
+	/**
+	 * Internally reject the event; this involves sending the needed
+	 * packets or such.
+	 */
+	protected abstract void doReject();
 	
 	@Override
 	public String toString() {

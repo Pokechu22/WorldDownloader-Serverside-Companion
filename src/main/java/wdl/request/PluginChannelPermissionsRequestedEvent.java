@@ -47,7 +47,17 @@ public class PluginChannelPermissionsRequestedEvent extends
 	}
 	
 	@Override
-	public boolean shouldForward() {
-		return true;
+	public boolean isForwarded() {
+		return false;
+	}
+	
+	@Override
+	protected void doAccept() {
+		//TODO
+	}
+	
+	@Override
+	protected void doReject() {
+		//TODO
 	}
 }
