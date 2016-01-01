@@ -42,6 +42,7 @@ import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
 import wdl.request.PermissionsRequestedEvent;
+import wdl.request.RequestManager;
 
 /**
  * Very simple WDL companion plugin.
@@ -81,6 +82,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	private BookCreator bookCreator;
 	private VaultHandler vaultHandler;
+	private RequestManager requestManager;
 	
 	/**
 	 * Map of all registered {@link IRangeGroupType}s by their IDs.
@@ -90,10 +92,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * Map of all registered {@link IRangeProducer}s by their IDs.
 	 */
 	private final Map<String, IRangeProducer> rangeProducers = new HashMap<>();
-	/**
-	 * List of active requests.
-	 */
-	private final Map<String, PermissionsRequestedEvent> requests = new HashMap<>();
 	
 	@Override
 	public void onLoad() {
@@ -119,6 +117,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		this.bookCreator = new BookCreator(this);
 		this.vaultHandler = new VaultHandler(this);
+		this.requestManager = new RequestManager(this);
 		
 		updateAllPlayers();
 		
@@ -403,14 +402,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				if (args[1].equals("deny")) {
 					args[1] = "reject";
 				}
-				
-				if (args[1].equals("list")) {
-					for (Map.Entry<String, PermissionsRequestedEvent> e : requests.entrySet()) {
-						sender.sendMessage(e.toString());
-					}
-				}
-				
-				bookCreator.openBook((Player)sender, "TEST", args);
+
+				sender.sendMessage("TODO");
 			}
 		}
 		
@@ -794,22 +787,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		packets[4] = WDLPackets.createWDLPacket4(ranges);
 		
 		return packets;
-	}
-	
-	@EventHandler
-	public void onPermissionsRequested(PermissionsRequestedEvent event) {
-		getLogger().info("Received request: " + event.toString());
-		getLogger().info("Requested permissions: ");
-		for (Map.Entry<String, String> e : event.getRequestedPermissions().entrySet()) {
-			getLogger().info(" * " + e.getKey() + ": " + e.getValue());
-		}
-		getLogger().info("Range requests: ");
-		for (ProtectionRange range : event.getRangeRequests()) {
-			getLogger().info(" * " + range.toString());
-		}
-		getLogger().info("Request reason: " + event.getRequestReason());
-		
-		requests.put(event.getPlayerName(), event);
 	}
 	
 	/**
