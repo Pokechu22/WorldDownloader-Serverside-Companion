@@ -45,4 +45,15 @@ public class RequestManager implements Listener {
 		
 		requests.put(event.getPlayerName().toLowerCase(), event);
 	}
+	
+	/**
+	 * Gets the request for the given player, or <code>null</code> if they have
+	 * none.
+	 * 
+	 * @param player The name of the player (case insensitive).
+	 * @return player's request
+	 */
+	public PermissionsRequestedEvent getPlayerRequest(String player) {
+		return requests.get(player.toLowerCase());
+	}
 }
