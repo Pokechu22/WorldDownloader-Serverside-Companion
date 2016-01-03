@@ -119,8 +119,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.vaultHandler = new VaultHandler(this);
 		this.requestManager = new RequestManager(this);
 		
-		updateAllPlayers();
-		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
 				private final String key;
@@ -263,6 +261,10 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				
 				// OK, now create the range producers.
 				createRangeProducers();
+				
+				// And finally, we can update all players so that they get
+				// their ranges.
+				updateAllPlayers();
 			}
 		}, 1);
 	}
