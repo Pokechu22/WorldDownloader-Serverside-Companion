@@ -1,0 +1,8 @@
+name: WorldGuard_support_for_WDLCompanion
+main: wdl.worldgaurd.WorldGuardSupportPlugin
+version: 1.0.0
+author: Pokechu22
+depend: [WDLCompanion, WorldGuard]
+description: |
+  Adds a ChunkOverride type, 'Owned WorldGuard regions', which allows a player
+  to download in their own WorldGuard regions.
