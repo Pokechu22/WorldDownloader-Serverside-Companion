@@ -24,14 +24,15 @@ import wdl.range.ProtectionRange;
  * 2. Make sure that ProtectedRegion#isPhysicalArea is true.
  * 3. Make sure that all of the regions are loaded.
  * 4. Handle new regions dynamically. (there doesn't _seem_ to be events for it)
- * 5. Differentiate between member, owner, and memberOnly.
- * 6. Maybe there is a better way to get all of the regions owned by a player.
+ * 5. Maybe there is a better way to get all of the regions owned by a player.
  */
 public class WorldGuardRangeProducer implements IRangeProducer {
 	private final IRangeGroup group;
+	private final OwnershipType ownershipType;
 	
-	public WorldGuardRangeProducer(IRangeGroup group) {
+	public WorldGuardRangeProducer(IRangeGroup group, OwnershipType ownershipType) {
 		this.group = group;
+		this.ownershipType = ownershipType;
 	}
 	
 	@Override
@@ -43,7 +44,7 @@ public class WorldGuardRangeProducer implements IRangeProducer {
 		
 		Collection<ProtectedRegion> regions = manager.getRegions().values();
 		for (ProtectedRegion region : regions) {
-			if (region.isMember(localPlayer)) { //Member or owner
+			if (ownershipType.has(localPlayer, region)) {
 				ranges.add(regionToRange(region));
 			}
 		}
