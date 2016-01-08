@@ -14,6 +14,6 @@ public class WorldGuardSupportPlugin extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void registerRangeGroupTypes(RangeGroupTypeRegistrationEvent e) {
-		e.addRegistration("Owned WorldGuard regions", new WorldGuardRangeGroupType(this));
+		e.addRegistration("Owned WorldGuard regions", new WorldGuardRangeGroupType());
 	}
 }

@@ -10,12 +10,6 @@ import wdl.range.IRangeGroupType;
 public class WorldGuardRangeGroupType implements
 		IRangeGroupType<WorldGuardRangeProducer> {
 
-	private final WorldGuardSupportPlugin plugin;
-	
-	public WorldGuardRangeGroupType(WorldGuardSupportPlugin plugin) {
-		this.plugin = plugin;
-	}
-
 	@Override
 	public boolean isValidConfig(ConfigurationSection config,
 			List<String> warnings, List<String> errors) {
