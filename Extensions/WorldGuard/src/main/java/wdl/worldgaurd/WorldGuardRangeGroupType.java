@@ -13,6 +13,16 @@ public class WorldGuardRangeGroupType implements
 	@Override
 	public boolean isValidConfig(ConfigurationSection config,
 			List<String> warnings, List<String> errors) {
+		boolean isValidConfig = true;
+		
+		if (config.isSet("preservePolygons")) {
+			if (!config.isBoolean("preservePolygons")) {
+				errors.add("'preservePolygons' (use exact edges on non-cubic "
+						+ " regions) must be a Boolean!");
+				
+				isValidConfig = false;
+			}
+		}
 		if (!config.isSet("ownershipType")) {
 			warnings.add("'ownershipType' is not specified!  The default, " +
 					"OWNER_OR_MEMBER (either owner or member), will be used.");
@@ -21,16 +31,19 @@ public class WorldGuardRangeGroupType implements
 						.getString("ownershipType").toUpperCase()))) {
 			errors.add("'ownershipType' must be a String with one of these " + 
 					"values: " + OwnershipType.NAMES);
-			return false;
+			
+			isValidConfig = false;
 		}
-		return true;
+		
+		return isValidConfig;
 	}
 
 	@Override
 	public WorldGuardRangeProducer createRangeProducer(IRangeGroup group,
 			ConfigurationSection config) {
 		return new WorldGuardRangeProducer(group, 
-				OwnershipType.match(config.getString("ownershipType")));
+				OwnershipType.match(config.getString("ownershipType")),
+				config.getBoolean("preservePolygons", false));
 	}
 
 	@Override

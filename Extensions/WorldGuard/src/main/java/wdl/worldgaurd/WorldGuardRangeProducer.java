@@ -7,9 +7,11 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import wdl.range.IRangeGroup;
@@ -20,19 +22,21 @@ import wdl.range.ProtectionRange;
  * IRangeProducer that gets the ranges owned by a player.
  * 
  * TODO:
- * 1. Handle polygonal regions better than just taking the min and max points.
- * 2. Make sure that ProtectedRegion#isPhysicalArea is true.
- * 3. Make sure that all of the regions are loaded.
- * 4. Handle new regions dynamically. (there doesn't _seem_ to be events for it)
- * 5. Maybe there is a better way to get all of the regions owned by a player.
+ * 1. Make sure that ProtectedRegion#isPhysicalArea is true.
+ * 2. Make sure that all of the regions are loaded.
+ * 3. Handle new regions dynamically. (there doesn't _seem_ to be events for it)
+ * 4. Maybe there is a better way to get all of the regions owned by a player.
  */
 public class WorldGuardRangeProducer implements IRangeProducer {
 	private final IRangeGroup group;
 	private final OwnershipType ownershipType;
+	private final boolean preservePolygons;
 	
-	public WorldGuardRangeProducer(IRangeGroup group, OwnershipType ownershipType) {
+	public WorldGuardRangeProducer(IRangeGroup group, OwnershipType ownershipType, 
+			boolean preservePolygons) {
 		this.group = group;
 		this.ownershipType = ownershipType;
+		this.preservePolygons = preservePolygons;
 	}
 	
 	@Override
@@ -45,7 +49,7 @@ public class WorldGuardRangeProducer implements IRangeProducer {
 		Collection<ProtectedRegion> regions = manager.getRegions().values();
 		for (ProtectedRegion region : regions) {
 			if (ownershipType.has(localPlayer, region)) {
-				ranges.add(regionToRange(region));
+				ranges.addAll(regionToRange(region));
 			}
 		}
 		
@@ -58,12 +62,10 @@ public class WorldGuardRangeProducer implements IRangeProducer {
 	}
 
 	/**
-	 * Converts a {@link ProtectedRegion} to a {@link ProtectionRange}.
-	 * This is a somewhat lossy conversion: Only the region's minimum and maximum
-	 * coordinates are used; if it is a polygonal region then this will not work.
-	 * But it's probably good enough, at least for now.
+	 * Converts a {@link ProtectedRegion} to a collection of
+	 * {@link ProtectionRange}s.
 	 */
-	private ProtectionRange regionToRange(ProtectedRegion region) {
+	private List<ProtectionRange> regionToRange(ProtectedRegion region) {
 		BlockVector max = region.getMaximumPoint();
 		BlockVector min = region.getMinimumPoint();
 		
@@ -72,7 +74,33 @@ public class WorldGuardRangeProducer implements IRangeProducer {
 		int x2 = max.getBlockX() / 16;
 		int z2 = max.getBlockZ() / 16;
 		
-		return new ProtectionRange(region.getId(), x1, z1, x2, z2);
+		List<ProtectionRange> ranges = new ArrayList<>();
+		
+		if (preservePolygons && region instanceof ProtectedPolygonalRegion) {
+			//TODO: there's probably something I can do to improve this logic.
+			
+			for (int x = x1; x <= x2; x++) {
+				for (int z = z1; z <= z2; z++) {
+					// Only checking the corners - probably a bad idea, but this
+					// should cover _most_ parts.
+					
+					if (region.contains(new BlockVector2D(x * 16, z * 16))
+							|| region.contains(new BlockVector2D(x * 16 + 15,
+									z * 16))
+							|| region.contains(new BlockVector2D(x * 16,
+									z * 16 + 15))
+							|| region.contains(new BlockVector2D(x * 16 + 15,
+									z * 16 + 15))) {
+						ranges.add(new ProtectionRange(region.getId(), x, z, x,
+								z));
+					}
+				}
+			}
+		} else {
+			ranges.add(new ProtectionRange(region.getId(), x1, z1, x2, z2));
+		}
+		
+		return ranges;
 	}
 	
 	@Override
