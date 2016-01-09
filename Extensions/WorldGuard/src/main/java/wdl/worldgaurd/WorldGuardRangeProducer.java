@@ -22,10 +22,9 @@ import wdl.range.ProtectionRange;
  * IRangeProducer that gets the ranges owned by a player.
  * 
  * TODO:
- * 1. Make sure that ProtectedRegion#isPhysicalArea is true.
- * 2. Make sure that all of the regions are loaded.
- * 3. Handle new regions dynamically. (there doesn't _seem_ to be events for it)
- * 4. Maybe there is a better way to get all of the regions owned by a player.
+ * 1. Make sure that all of the regions are loaded.
+ * 2. Handle new regions dynamically. (there doesn't _seem_ to be events for it)
+ * 3. Maybe there is a better way to get all of the regions owned by a player.
  */
 public class WorldGuardRangeProducer implements IRangeProducer {
 	private final IRangeGroup group;
@@ -75,6 +74,11 @@ public class WorldGuardRangeProducer implements IRangeProducer {
 		int z2 = max.getBlockZ() / 16;
 		
 		List<ProtectionRange> ranges = new ArrayList<>();
+		
+		if (!region.isPhysicalArea()) {
+			// Return an empty list.
+			return ranges;
+		}
 		
 		if (preservePolygons && region instanceof ProtectedPolygonalRegion) {
 			//TODO: there's probably something I can do to improve this logic.
