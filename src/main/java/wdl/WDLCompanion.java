@@ -81,7 +81,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			= new HashMap<>();
 	
 	private BookCreator bookCreator;
-	private VaultHandler vaultHandler;
 	private RequestManager requestManager;
 	
 	/**
@@ -116,7 +115,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
 		this.bookCreator = new BookCreator(this);
-		this.vaultHandler = new VaultHandler(this);
 		this.requestManager = new RequestManager(this);
 		
 		try {
@@ -318,7 +316,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("reload")) {
-				if (!vaultHandler.hasPermission(sender, "wdl.reloadConfig")) {
+				if (!sender.hasPermission("wdl.reloadConfig")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -337,7 +335,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("update")) {
-				if (!vaultHandler.hasPermission(sender, "wdl.updatePlayer")) {
+				if (!sender.hasPermission("wdl.updatePlayer")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -369,7 +367,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("updateall")) {
-				if (!vaultHandler.hasPermission(sender, "wdl.updatePlayer")) {
+				if (!sender.hasPermission("wdl.updatePlayer")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -385,7 +383,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			}
 			
 			if (args[0].equals("requests")) {
-				if (!vaultHandler.hasPermission(sender, "wdl.handleRequests")) {
+				if (!sender.hasPermission("wdl.handleRequests")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -533,7 +531,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * @return The download radius applicable to that player.
 	 */
 	private int getSaveRadius(Player player) {
-		if (vaultHandler.hasPermission(player, "wdl.fullDownloadRadius")) {
+		if (player.hasPermission("wdl.fullDownloadRadius")) {
 			return -1;
 		}
 		
@@ -613,7 +611,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 */
 	private boolean getConfigValue(Player player, String configKey,
 			String overridePerm) {
-		if (vaultHandler.hasPermission(player, overridePerm)) {
+		if (player.hasPermission(overridePerm)) {
 			return true;
 		} else {
 			return getWorldConfigValue(player.getWorld(), configKey);
