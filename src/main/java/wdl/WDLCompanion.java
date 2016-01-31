@@ -82,6 +82,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	private BookCreator bookCreator;
 	private RequestManager requestManager;
+	private PermissionHandler permissionHandler;
 	
 	/**
 	 * Map of all registered {@link IRangeGroupType}s by their IDs.
@@ -116,6 +117,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		this.bookCreator = new BookCreator(this);
 		this.requestManager = new RequestManager(this);
+		this.permissionHandler = new PermissionHandler(this);
 		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
@@ -523,57 +525,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	}
 	
 	/**
-	 * Gets the download radius a player has, based off of their permissions and
-	 * the <code>saveRadius</code> value in the config file.
-	 * 
-	 * @param player
-	 *            The player to get the download radius of.
-	 * @return The download radius applicable to that player.
-	 */
-	private int getSaveRadius(Player player) {
-		if (player.hasPermission("wdl.fullDownloadRadius")) {
-			return -1;
-		}
-		
-		int configDownloadRadius;
-		
-		String worldConfigKey = "wdl.per-world." + 
-				player.getWorld().getName() + ".saveRadius";
-		if (getConfig().isInt(worldConfigKey)) {
-			configDownloadRadius = getConfig().getInt(worldConfigKey);
-		} else {
-			configDownloadRadius = getConfig().getInt("wdl.saveRadius");
-		}
-		
-		if (configDownloadRadius <= -1) {
-			return -1;
-		}
-
-		return configDownloadRadius;
-	}
-
-	/**
-	 * Gets a world-specific configuration setting, or the default one if 
-	 * there is none set for the configuration.
-	 * 
-	 * @param world
-	 *            The world to use.
-	 * @param key
-	 *            The config key, which should be in the format of 
-	 *            "canDoNewThings", not "wdl.canDoNewThings".
-	 * @return
-	 */
-	private boolean getWorldConfigValue(World world, String key) {
-		String worldName = world.getName();
-		String worldKey = "wdl.per-world." + worldName + "." + key;
-		if (getConfig().isBoolean(worldKey)) {
-			return getConfig().getBoolean(worldKey);
-		}
-		
-		return getConfig().getBoolean("wdl." + key);
-	}
-	
-	/**
 	 * Gets a world-specific configuration setting, or the default one if 
 	 * there is none set for the configuration.
 	 * 
@@ -592,30 +543,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		}
 		
 		return getConfig().getString("wdl." + key);
-	}
-	
-	/**
-	 * Gets a value from the config for the given player, unless it is
-	 * overwritten.
-	 * 
-	 * @param player
-	 *            The player to check permissions for.
-	 * @param configKey
-	 *            The key in the config to check.  It should be in the 
-	 *            format of "canDoNewThings", not "wdl.canDoNewThings". 
-	 * @param overridePerm
-	 *            The permission that overrides the config value.  Unlike
-	 *            the configKey, this should be fully qualified, for
-	 *            example "wdl.canDoNewThings".
-	 * @return The value from the config or permissions.
-	 */
-	private boolean getConfigValue(Player player, String configKey,
-			String overridePerm) {
-		if (player.hasPermission(overridePerm)) {
-			return true;
-		} else {
-			return getWorldConfigValue(player.getWorld(), configKey);
-		}
 	}
 
 	/**
@@ -749,30 +676,23 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		byte[][] packets = new byte[5][];
 		
 		//Packet #1
-		boolean globalIsEnabled = getConfigValue(player,
-				"canDownloadInGeneral", "wdl.overrideCanDownloadInGeneral");
-		int saveRadius = getSaveRadius(player);
-		boolean cacheChunks = getConfigValue(player, "canCacheChunks",
-				"wdl.overrideCanCacheChunks");
-		boolean saveEntities = getConfigValue(player, "canSaveEntities",
-				"wdl.overrideCanSaveEntities");
-		boolean saveTileEntities = getConfigValue(player,
-				"canSaveTileEntities", "wdl.overrideCanSaveTileEntities");
-		boolean saveContainers = getConfigValue(player,
-				"canSaveContainers", "wdl.overrideCanSaveContainers");
+		boolean globalIsEnabled = permissionHandler.getCanDownloadInGeneral(player);
+		int saveRadius = permissionHandler.getSaveRadius(player);
+		boolean cacheChunks = permissionHandler.getCanCacheChunks(player);
+		boolean saveEntities = permissionHandler.getCanSaveEntities(player);
+		boolean saveTileEntities = permissionHandler.getCanSaveEntities(player);
+		boolean saveContainers = permissionHandler.getCanSaveContainers(player);
 
 		packets[1] = WDLPackets.createWDLPacket1(globalIsEnabled, saveRadius, cacheChunks,
 				saveEntities, saveTileEntities, saveContainers);
 		
 		//Packet #0
-		boolean canDoNewThings = getConfigValue(player, 
-				"canDoNewThings", "wdl.overrideCanDoNewThings");
+		boolean canDoNewThings = permissionHandler.getCanDoNewThings(player);
 		packets[0] = WDLPackets.createWDLPacket0(canDoNewThings && globalIsEnabled);
 		
 		//Packet #2
 		Map<String, Integer> entityMap = new HashMap<>();
-		if (globalIsEnabled && saveEntities && getConfigValue(player,
-				"sendEntityRanges", "wdl.overrideSendEntityRanges")) {
+		if (globalIsEnabled && saveEntities && permissionHandler.getSendEntityRanges(player)) {
 			entityMap.putAll(getEntityRanges(player));
 		}
 		packets[2] = WDLPackets.createWDLPacket2(entityMap);
