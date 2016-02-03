@@ -45,14 +45,14 @@ import wdl.request.PermissionsRequestedEvent;
 import wdl.request.RequestManager;
 
 /**
- * Very simple WDL companion plugin.
+ * Serverside plugin for World Downloader.
  * 
- * This goes on the server, and can be used to limit or disable WDL. Note that
- * this doesn't guarantee people can't use WDL to download more than they
- * should; it simply limits the options.
+ * Makes use of the plugin channel system to control various features of the
+ * mod as needed, and supports chunk overrides and permission requests.
  * 
  * @author Pokechu22
- *
+ * 
+ * @see <a href="http://wiki.vg/User:Pokechu22/World_downloader">The protocol doc</a>
  */
 public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageListener {
 	/**
