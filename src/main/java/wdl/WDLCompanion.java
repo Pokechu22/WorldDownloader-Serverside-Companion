@@ -41,7 +41,7 @@ import wdl.range.IRangeGroupType;
 import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
-import wdl.request.PermissionsRequestedEvent;
+import wdl.request.PermissionRequest;
 import wdl.request.RequestManager;
 
 /**
@@ -81,7 +81,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			= new HashMap<>();
 	
 	private BookCreator bookCreator;
-	private RequestManager requestManager;
 	private PermissionHandler permissionHandler;
 	
 	/**
@@ -116,7 +115,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
 		this.bookCreator = new BookCreator(this);
-		this.requestManager = new RequestManager(this);
 		this.permissionHandler = new PermissionHandler(this);
 		
 		try {
@@ -405,7 +403,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					args[1] = "reject";
 				}
 
-				sender.sendMessage("TODO");
+				if (args[1].equals("list")) {
+					// TODO: Pagination would be nice, and hiding past requests.
+					for (PermissionRequest request : RequestManager.getRequests()) {
+						sender.sendMessage(request.toString());
+					}
+				}
 			}
 		}
 		
@@ -470,10 +473,10 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		}
 		
 		if (channel.equals(REQUEST_CHANNEL_NAME)) {
-			PermissionsRequestedEvent event = WDLPackets.readPermissionRequest(
-					player, data);
+			PermissionRequest request = WDLPackets.readPermissionRequest(player, data);
 			
-			Bukkit.getPluginManager().callEvent(event);
+			// TODO: An event, maybe?
+			RequestManager.addRequest(request);
 		}
 	}
 

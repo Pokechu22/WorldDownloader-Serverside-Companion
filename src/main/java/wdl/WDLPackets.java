@@ -8,7 +8,7 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import wdl.range.ProtectionRange;
-import wdl.request.PluginChannelPermissionsRequestedEvent;
+import wdl.request.PermissionRequest;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -250,7 +250,7 @@ public class WDLPackets {
 	/**
 	 * Reads a permission request.
 	 */
-	public static PluginChannelPermissionsRequestedEvent readPermissionRequest(
+	public static PermissionRequest readPermissionRequest(
 			Player player, byte[] data) {
 		ByteArrayDataInput input = ByteStreams.newDataInput(data);
 		
@@ -271,8 +271,8 @@ public class WDLPackets {
 			rangeRequests.add(readProtectionRange(input));
 		}
 		
-		return new PluginChannelPermissionsRequestedEvent(player,
-				requestReason, requestedPerms, rangeRequests);
+		return new PermissionRequest(player, requestReason, requestedPerms,
+				rangeRequests);
 	}
 	
 	/**

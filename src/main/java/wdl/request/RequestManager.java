@@ -1,26 +1,18 @@
 package wdl.request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-
-import wdl.WDLCompanion;
-import wdl.range.ProtectionRange;
+import java.util.UUID;
 
 /**
  * Keeps track of requests.
  */
-public class RequestManager implements Listener {
-	private final WDLCompanion plugin;
-	
-	public RequestManager(WDLCompanion plugin) {
-		this.plugin = plugin;
-		
-		Bukkit.getPluginManager().registerEvents(this, plugin);
+public class RequestManager {
+	@Deprecated
+	private RequestManager() {
+		throw new AssertionError();
 	}
 	
 	/**
@@ -28,22 +20,15 @@ public class RequestManager implements Listener {
 	 * 
 	 * Player names are lowercased first to help with finding the right player.
 	 */
-	private Map<String, PermissionsRequestedEvent> requests = new HashMap<>();
+	private static Map<String, PermissionRequest> requestsByName = new HashMap<>();
+	/**
+	 * Active requests, by player ID.
+	 */
+	private static Map<UUID, PermissionRequest> requestsById = new HashMap<>();
 	
-	@EventHandler(priority=EventPriority.LOWEST)
-	private void onRequest(PermissionsRequestedEvent event) {
-		plugin.getLogger().info("Received request: " + event.toString());
-		plugin.getLogger().info("Requested permissions: ");
-		for (Map.Entry<String, String> e : event.getRequestedPermissions().entrySet()) {
-			plugin.getLogger().info(" * " + e.getKey() + ": " + e.getValue());
-		}
-		plugin.getLogger().info("Range requests: ");
-		for (ProtectionRange range : event.getRangeRequests()) {
-			plugin.getLogger().info(" * " + range.toString());
-		}
-		plugin.getLogger().info("Request reason: " + event.getRequestReason());
-		
-		requests.put(event.getPlayerName().toLowerCase(), event);
+	public static void addRequest(PermissionRequest request) {
+		requestsByName.put(request.playerName.toLowerCase(), request);
+		requestsById.put(request.playerId, request);
 	}
 	
 	/**
@@ -53,7 +38,11 @@ public class RequestManager implements Listener {
 	 * @param player The name of the player (case insensitive).
 	 * @return player's request
 	 */
-	public PermissionsRequestedEvent getPlayerRequest(String player) {
-		return requests.get(player.toLowerCase());
+	public static PermissionRequest getPlayerRequest(String player) {
+		return requestsByName.get(player.toLowerCase());
+	}
+	
+	public static List<PermissionRequest> getRequests() {
+		return new ArrayList<>(requestsById.values());
 	}
 }
