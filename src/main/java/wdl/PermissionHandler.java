@@ -1,6 +1,11 @@
 package wdl;
 
+import java.util.logging.Level;
+
 import org.bukkit.entity.Player;
+
+import wdl.request.PermissionRequest;
+import wdl.request.RequestManager;
 
 /**
  * Handles checking if a player has permission.
@@ -22,6 +27,9 @@ public class PermissionHandler {
 		if (player.hasPermission("wdl.overrideCanDownloadInGeneral")) {
 			return true;
 		}
+		if (getRequestedBoolean(player, "downloadInGeneral")) {
+			return true;
+		}
 		
 		return getPerworldBoolean(player, "canDownloadInGeneral");
 	}
@@ -31,6 +39,9 @@ public class PermissionHandler {
 	 */
 	public boolean getCanCacheChunks(Player player) {
 		if (player.hasPermission("wdl.overrideCanCacheChunks")) {
+			return true;
+		}
+		if (getRequestedBoolean(player, "cacheChunks")) {
 			return true;
 		}
 		
@@ -44,6 +55,9 @@ public class PermissionHandler {
 		if (player.hasPermission("wdl.overrideCanSaveEntities")) {
 			return true;
 		}
+		if (getRequestedBoolean(player, "saveEntities")) {
+			return true;
+		}
 		
 		return getPerworldBoolean(player, "canSaveEntities");
 	}
@@ -55,6 +69,9 @@ public class PermissionHandler {
 		if (player.hasPermission("wdl.overrideCanSaveTileEntities")) {
 			return true;
 		}
+		if (getRequestedBoolean(player, "saveTileEntities")) {
+			return true;
+		}
 		
 		return getPerworldBoolean(player, "canSaveTileEntities");
 	}
@@ -64,6 +81,9 @@ public class PermissionHandler {
 	 */
 	public boolean getCanSaveContainers(Player player) {
 		if (player.hasPermission("wdl.overrideCanSaveContainers")) {
+			return true;
+		}
+		if (getRequestedBoolean(player, "saveContainers")) {
 			return true;
 		}
 		
@@ -78,6 +98,7 @@ public class PermissionHandler {
 		if (player.hasPermission("wdl.overrideCanDoNewThings")) {
 			return true;
 		}
+		// No request value for this. 
 		
 		return getPerworldBoolean(player, "canDoNewThings");
 	}
@@ -87,6 +108,9 @@ public class PermissionHandler {
 	 */
 	public boolean getSendEntityRanges(Player player) {
 		if (player.hasPermission("wdl.overrideSendEntityRanges")) {
+			return true;
+		}
+		if (getRequestedBoolean(player, "getEntityRanges")) {
 			return true;
 		}
 		
@@ -101,6 +125,23 @@ public class PermissionHandler {
 	public int getSaveRadius(Player player) {
 		if (player.hasPermission("wdl.overrideSaveRadius")) {
 			return -1;
+		}
+		
+		PermissionRequest request = RequestManager.getPlayerRequest(player);
+		if (request != null) {
+			if (request.state == PermissionRequest.State.ACCEPTED) {
+				String result = request.requestedPerms.get("saveRadius");
+				if (result != null) {
+					try {
+						return Integer.parseInt(result);
+					} catch (NumberFormatException e) {
+						plugin.getLogger().log(Level.WARNING,
+								"Failed to parse requested value for " + player
+										+ ": '" + result + "'", e);
+						// continue on to the per-world values.
+					}
+				}
+			}
 		}
 		
 		int configDownloadRadius;
@@ -132,5 +173,21 @@ public class PermissionHandler {
 		}
 		
 		return plugin.getConfig().getBoolean("wdl." + configKey);
+	}
+	
+	/**
+	 * If the given player has requested the given permission, and their request
+	 * was accepted, returns true.
+	 */
+	private boolean getRequestedBoolean(Player player, String key) {
+		PermissionRequest request = RequestManager.getPlayerRequest(player);
+		if (request == null) {
+			return false;
+		}
+		if (request.state != PermissionRequest.State.ACCEPTED) {
+			return false;
+		}
+		String result = request.requestedPerms.get(key);
+		return result != null && result.equals("true");
 	}
 }

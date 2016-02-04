@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.entity.Player;
+
 /**
  * Keeps track of requests.
  */
@@ -40,6 +42,17 @@ public class RequestManager {
 	 */
 	public static PermissionRequest getPlayerRequest(String player) {
 		return requestsByName.get(player.toLowerCase());
+	}
+	
+	/**
+	 * Gets the request for the given player, or <code>null</code> if they have
+	 * none.
+	 * 
+	 * @param player The player
+	 * @return player's request
+	 */
+	public static PermissionRequest getPlayerRequest(Player player) {
+		return requestsById.get(player.getUniqueId());
 	}
 	
 	public static List<PermissionRequest> getRequests() {
