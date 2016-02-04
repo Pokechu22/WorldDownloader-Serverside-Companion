@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.google.common.collect.ImmutableList;
@@ -22,20 +23,35 @@ public class PermissionRequest {
 		/**
 		 * The request is waiting on moderator action.
 		 */
-		WAITING,
+		WAITING(ChatColor.YELLOW),
 		/**
 		 * The request has been accepted and the player granted the right permissions.
 		 */
-		ACCEPTED,
+		ACCEPTED(ChatColor.GREEN),
 		/**
 		 * The request has been rejected by a moderator.  (Currently unused)
 		 */
-		REJECTED,
+		REJECTED(ChatColor.RED),
 		/**
 		 * The request has been withdrawn by the submitting player (either
 		 * directly or by creating a new request).  (Currently unused)
 		 */
-		WITHDRAWN;
+		WITHDRAWN(ChatColor.GRAY, ChatColor.ITALIC);
+		
+		public final String prefix;
+		
+		private State(ChatColor... colors) {
+			StringBuilder builder = new StringBuilder();
+			for (ChatColor color : colors) {
+				builder.append(color);
+			}
+			prefix = builder.toString();
+		}
+		
+		@Override
+		public String toString() {
+			return prefix;
+		}
 	}
 	
 	/**
@@ -73,5 +89,10 @@ public class PermissionRequest {
 		this.requestReason = requestReason;
 		this.requestedPerms = ImmutableMap.copyOf(requestedPerms);
 		this.rangeRequests = ImmutableList.copyOf(rangeRequests);
+	}
+	
+	@Override
+	public String toString() {
+		return playerName + ": " + requestedPerms.size() + " perm(s), " + rangeRequests.size() + " range(s)";
 	}
 }

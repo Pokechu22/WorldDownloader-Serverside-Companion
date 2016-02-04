@@ -391,13 +391,14 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					sender.sendMessage("Usage: ");
 					sender.sendMessage("/wdl requests list -- List all requests.");
 					sender.sendMessage("/wdl requests show <player> -- Show <player>'s request, if present.");
-					sender.sendMessage("/wdl requests approve <player> -- Approve <player>'s request.");
+					sender.sendMessage("/wdl requests accept <player> -- Approve <player>'s request.");
 					sender.sendMessage("/wdl requests reject <player> -- Deny <player>'s request.");
 					return true;
 				}
 				// Aliases
-				if (args[1].equals("aprove")) {
-					args[1] = "approve";
+				if (args[1].equals("acept") || args[1].equals("approve")
+						|| args[1].equals("aprove")) {
+					args[1] = "accept";
 				}
 				if (args[1].equals("deny")) {
 					args[1] = "reject";
@@ -406,9 +407,62 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				if (args[1].equals("list")) {
 					// TODO: Pagination would be nice, and hiding past requests.
 					for (PermissionRequest request : RequestManager.getRequests()) {
-						sender.sendMessage(request.toString());
+						sender.sendMessage(request.state.prefix + request.toString());
 					}
+					return true;
+				} else if (args[1].equals("show")) {
+					if (args.length != 3) {
+						sender.sendMessage("Usage: /wdl requests show <player> -- Show <player>'s request, if present.");
+						return true;
+					}
+					PermissionRequest request = RequestManager.getPlayerRequest(args[2]);
+					if (request == null) {
+						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
+						return true;
+					}
+					sender.sendMessage(args[2] + "'s request ("
+							+ request.state.prefix + request.state.name()
+							+ "§r):");
+					sender.sendMessage("Requesting: ");
+					for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
+						sender.sendMessage(" * " + e.getKey() + " to be " + e.getValue());
+					}
+					sender.sendMessage("Ranges: ");
+					for (ProtectionRange range :  request.rangeRequests) {
+						sender.sendMessage(" * " + range);
+					}
+					sender.sendMessage("Reason: ");
+					sender.sendMessage(request.requestReason);
+					return true;
+				} else if (args[1].equals("accept")) {
+					if (args.length != 3) {
+						sender.sendMessage("Usage: /wdl requests accept <player> -- Approve <player>'s request");
+						return true;
+					}
+					PermissionRequest request = RequestManager.getPlayerRequest(args[2]);
+					if (request == null) {
+						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
+						return true;
+					}
+					
+					Player player = Bukkit.getPlayer(args[2]);
+					if (player == null) {
+						sender.sendMessage("§cPlayer '" + args[2] + "' isn't online.");
+						return true;
+					}
+					
+					request.state = PermissionRequest.State.ACCEPTED;
+					sender.sendMessage("Accepted " + args[2] + "'s request.");
+					updatePlayer(player);
+					return true;
+				} else if (args[1].equals("reject")) {
+					sender.sendMessage("§cNot yet implemented - sorry :/");
+					return true;
 				}
+				
+				sender.sendMessage("§cUnknown requests subcommand '" + args[1]
+						+ "'.  Do '/wdl requests' for usage.");
+				return true;
 			}
 		}
 		
