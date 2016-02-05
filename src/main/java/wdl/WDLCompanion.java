@@ -31,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.util.ChatPaginator;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
@@ -389,7 +390,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 				if (args.length == 1) {
 					sender.sendMessage("Usage: ");
-					sender.sendMessage("/wdl requests list -- List all requests.");
+					sender.sendMessage("/wdl requests list [page] -- List all requests.");
 					sender.sendMessage("/wdl requests show <player> -- Show <player>'s request, if present.");
 					sender.sendMessage("/wdl requests accept <player> -- Approve <player>'s request.");
 					sender.sendMessage("/wdl requests reject <player> -- Deny <player>'s request.");
@@ -405,10 +406,63 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				}
 
 				if (args[1].equals("list")) {
-					// TODO: Pagination would be nice, and hiding past requests.
-					for (PermissionRequest request : RequestManager.getRequests()) {
-						sender.sendMessage(request.state.prefix + request.toString());
+					int page = 1;
+					final int NUM_PER_PAGE = 8;
+					
+					List<PermissionRequest> requests = RequestManager.getRequests();
+					int numPages = (int) Math.ceil(requests.size()
+							/ (float)NUM_PER_PAGE);
+					
+					if (args.length > 3) {
+						sender.sendMessage("§cUsage: /wdl requests list [page] -- List all requests.");
+						return true;
 					}
+					if (args.length == 3) {
+						try {
+							page = Integer.parseInt(args[2]);
+						} catch (NumberFormatException e) {
+							sender.sendMessage("§cInvalid page number: '"
+									+ args[2] + "' is not a number!");
+							return true;
+						}
+						if (page < 0) {
+							sender.sendMessage("§cInvalid page number: Must be greater than 0!");
+							return true;
+						}
+					}
+					
+					if (numPages == 0) {
+						sender.sendMessage("There currently are no requests!");
+						return true;
+					}
+					
+					if (page > numPages) {
+						sender.sendMessage("§cInvalid page number: There are only " + numPages + " pages!");
+						return true;
+					}
+					
+					sender.sendMessage("Permission requests (page " + page + " of " + numPages +"): ");
+					for (int i = 0; i < NUM_PER_PAGE; i++) {
+						int index = NUM_PER_PAGE * (page - 1) + i;
+						if (index >= requests.size()) {
+							break;
+						}
+						PermissionRequest request = requests.get(index);
+						String description = request.state.prefix
+								+ request.toString() + " - ";
+						int remainingChars = 65 - description.length();
+						if (remainingChars > 0) {
+							if (request.requestReason.length() <= remainingChars) {
+								description += request.requestReason;
+							} else {
+								description += request.requestReason.substring(
+										0, remainingChars) + "...";
+							}
+						}
+
+						sender.sendMessage(description);
+					}
+					
 					return true;
 				} else if (args[1].equals("show")) {
 					if (args.length != 3) {
