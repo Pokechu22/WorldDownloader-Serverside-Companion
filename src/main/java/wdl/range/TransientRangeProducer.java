@@ -74,12 +74,39 @@ public class TransientRangeProducer implements IRangeProducer {
 	
 	/**
 	 * Gives the given player download permission in the given ranges until
+	 * the next server reload.
+	 * 
+	 * @param player The player to give the ranges to.
+	 * @param ranges The ranges.
+	 */
+	public void addRanges(Player player, List<ProtectionRange> ranges) {
+		rangeGroup.addRanges(player, ranges);
+	}
+	
+	/**
+	 * Gives the given player download permission in the given ranges until
 	 * the given number of ticks have elapsed.
 	 * 
 	 * @param player The player to give the ranges to.
 	 * @param ranges The ranges.
 	 */
 	public void addRanges(Player player, int ticks, ProtectionRange... ranges) {
+		rangeGroup.addRanges(player, ranges);
+		
+		// Queue later removal.
+		RemoveExpiredRangesTask task = new RemoveExpiredRangesTask(player, ranges);
+		task.runTaskLater(owner, ticks);
+		activeRemovalTasks.add(task);
+	}
+	
+	/**
+	 * Gives the given player download permission in the given ranges until
+	 * the given number of ticks have elapsed.
+	 * 
+	 * @param player The player to give the ranges to.
+	 * @param ranges The ranges.
+	 */
+	public void addRanges(Player player, int ticks, List<ProtectionRange> ranges) {
 		rangeGroup.addRanges(player, ranges);
 		
 		// Queue later removal.
@@ -117,6 +144,11 @@ public class TransientRangeProducer implements IRangeProducer {
 		public RemoveExpiredRangesTask(Player player, ProtectionRange... ranges) {
 			this.uuid = player.getUniqueId();
 			this.rangesToRemove = Arrays.asList(ranges);
+		}
+		
+		public RemoveExpiredRangesTask(Player player, List<ProtectionRange> ranges) {
+			this.uuid = player.getUniqueId();
+			this.rangesToRemove = ranges;
 		}
 		
 		@Override

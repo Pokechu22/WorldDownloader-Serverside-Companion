@@ -31,7 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.util.ChatPaginator;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
@@ -42,6 +41,7 @@ import wdl.range.IRangeGroupType;
 import wdl.range.ProtectionRange;
 import wdl.range.ChunkRangeGroupType;
 import wdl.range.IRangeProducer;
+import wdl.range.TransientRangeProducer;
 import wdl.request.PermissionRequest;
 import wdl.request.RequestManager;
 
@@ -83,6 +83,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	
 	private BookCreator bookCreator;
 	private PermissionHandler permissionHandler;
+	
+	/**
+	 * A transient range producer to store ranges from accepted permission
+	 * requests.
+	 */
+	private TransientRangeProducer requestRangeProducer;
 	
 	/**
 	 * Map of all registered {@link IRangeGroupType}s by their IDs.
@@ -507,7 +513,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					
 					request.state = PermissionRequest.State.ACCEPTED;
 					sender.sendMessage("Accepted " + args[2] + "'s request.");
-					updatePlayer(player);
+					if (request.requestedPerms.size() > 0) {
+						updatePlayer(player);
+					}
+					if (request.rangeRequests.size() > 0) {
+						requestRangeProducer.addRanges(player,
+								request.rangeRequests);
+					}
 					return true;
 				} else if (args[1].equals("reject")) {
 					sender.sendMessage("§cNot yet implemented - sorry :/");
@@ -627,12 +639,17 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						+ ", but that was not found.");
 			}
 			
-			IRangeGroup group = new RangeGroup(key, WDLCompanion.this);
+			IRangeGroup group = new RangeGroup(key, this);
 			IRangeProducer producer = type.createRangeProducer(group,
 					override);
 			
 			rangeProducers.put(key, producer);
 		}
+		
+		// Set up the range producer used with permission requests.
+		RangeGroup requestRangeGroup = new RangeGroup("<Permission requests>", this);
+		this.requestRangeProducer = new TransientRangeProducer(requestRangeGroup, this);
+		rangeProducers.put("<Permission requests>", this.requestRangeProducer);
 	}
 	
 	/**
