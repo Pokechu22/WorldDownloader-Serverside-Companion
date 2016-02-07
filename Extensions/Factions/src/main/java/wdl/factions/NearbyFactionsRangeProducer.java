@@ -29,6 +29,7 @@ import com.massivecraft.factions.entity.MPerm;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.factions.event.EventFactionsChunksChange;
 import com.massivecraft.factions.event.EventFactionsMembershipChange;
+import com.massivecraft.factions.event.EventFactionsPermChange;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.MUtil;
 
@@ -92,6 +93,63 @@ public class NearbyFactionsRangeProducer extends BukkitRunnable implements
 		}
 		
 		playersNeedingUpdating.clear();
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPermChange(EventFactionsPermChange e) {
+		if (e.getPerm() == plugin.getOrRegisterDownloadPerm()) {
+			if (e.getRel().isRank()) {
+				// isRank means that it's a member of the faction;
+				// members of the faction should be updated directly
+				// rather than searching for nearby players.
+				List<MPlayer> players = e.getFaction().getMPlayersWhereRole(
+						e.getRel());
+				
+				// TODO: It may be faster to add a nearby check, or maybe
+				// not, but for now we'll update all players with this
+				// relation whether they need it or not.
+				for (MPlayer mplayer : players) {
+					Player player = convertMPlayerToPlayer(mplayer);
+					if (player != null) {
+						playersNeedingUpdating.add(player.getUniqueId());
+					}
+				}
+			} else {
+				Set<String> worlds = new HashSet<String>();
+				Multimap<String, PS> chunksByWorld = HashMultimap.create();
+				
+				for (PS ps : BoardColl.get().getChunks(e.getFaction())) {
+					worlds.add(ps.getWorld());
+					chunksByWorld.put(ps.getWorld(), ps);
+				}
+				
+				//TODO: This doesn't seem to be a good algorithm.
+				for (String world : worlds) {
+					playerLoop: for (Player player : Bukkit.getWorld(world).getPlayers()) {
+						if (!rangeGroup.isWDLPlayer(player)) {
+							continue;
+						}
+						
+						MPlayer mplayer = convertPlayerToMPlayer(player);
+						
+						if (e.getFaction().getRelationTo(mplayer) != e.getRel()) {
+							// Permission changes only affect players with that
+							// relation.
+							continue;
+						}
+						
+						PS playerPs = PS.valueOf(player);
+						
+						for (PS ps : chunksByWorld.get(world)) {
+							if (isWithinUpdateDistance(playerPs, ps)) {
+								playersNeedingUpdating.add(player.getUniqueId());
+								continue playerLoop;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**
