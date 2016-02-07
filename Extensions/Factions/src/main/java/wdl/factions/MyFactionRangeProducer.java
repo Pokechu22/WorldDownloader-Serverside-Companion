@@ -20,6 +20,7 @@ import com.massivecraft.factions.entity.MPerm;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.factions.event.EventFactionsChunksChange;
 import com.massivecraft.factions.event.EventFactionsMembershipChange;
+import com.massivecraft.factions.event.EventFactionsPermChange;
 import com.massivecraft.massivecore.ps.PS;
 import com.massivecraft.massivecore.util.MUtil;
 
@@ -76,13 +77,44 @@ public class MyFactionRangeProducer implements IRangeProducer, Listener {
 	}
 	
 	/**
+	 * Called when the permission for a certain relation within a faction
+	 * changes.  Updates the permissions for the affected players.
+	 */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPermChange(EventFactionsPermChange e) {
+		if (e.getPerm() == plugin.getOrRegisterDownloadPerm()) {
+			List<MPlayer> players = e.getFaction().getMPlayersWhereRole(
+					e.getRel());
+			
+			for (MPlayer mplayer : players) {
+				Player player = convertMPlayerToPlayer(mplayer);
+				
+				if (player == null) {
+					continue;
+				}
+				if (e.getNewValue() == true) {
+					Set<PS> newPS = getFactionPositions(player.getWorld(),
+							e.getFaction());
+					List<ProtectionRange> newRanges = convertPSToRanges(
+							player.getWorld(), newPS, e.getFaction());
+					// Give the player their new ranges
+					rangeGroup.setRanges(player, newRanges);
+				} else {
+					// Remove the old ranges
+					rangeGroup.setRanges(player, new ProtectionRange[0]);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Called when a faction's chunks change.  Regenerates the chunk list of
 	 * all players who were effected.
 	 */
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onFactionChunksChange(EventFactionsChunksChange e) {
 		//NOTE: This is NOT an exhaustive list.  It only covers changed chunks.
-		//It should be safe to amuse that these chunks are no longer for that faction.
+		//It should be safe to assume that these chunks are no longer for that faction.
 		Map<Faction, Set<PS>> oldFactionChunk = e.getOldFactionChunks();
 		Set<Faction> oldFactions = oldFactionChunk.keySet();
 		
