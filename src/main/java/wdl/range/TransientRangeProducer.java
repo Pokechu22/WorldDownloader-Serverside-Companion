@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,7 +29,7 @@ public class TransientRangeProducer implements IRangeProducer {
 	/**
 	 * Current ranges.
 	 */
-	private final transient Map<UUID, List<ProtectionRange>> ranges = new HashMap<>();
+	private final transient Map<UUID, List<ProtectionRange>> playerRanges = new HashMap<>();
 	
 	/**
 	 * Creates a new {@link TransientRangeProducer}.
@@ -49,8 +50,8 @@ public class TransientRangeProducer implements IRangeProducer {
 	
 	@Override
 	public List<ProtectionRange> getInitialRanges(Player player) {
-		if (ranges.containsKey(player.getUniqueId())) {
-			return ranges.get(player.getUniqueId());
+		if (playerRanges.containsKey(player.getUniqueId())) {
+			return playerRanges.get(player.getUniqueId());
 		} else {
 			return new ArrayList<>();
 		}
@@ -70,6 +71,11 @@ public class TransientRangeProducer implements IRangeProducer {
 	 */
 	public void addRanges(Player player, ProtectionRange... ranges) {
 		rangeGroup.addRanges(player, ranges);
+		if (!this.playerRanges.containsKey(player.getUniqueId())) {
+			this.playerRanges.put(player.getUniqueId(), new ArrayList<ProtectionRange>());
+		}
+		this.playerRanges.get(player.getUniqueId()).addAll(
+				Arrays.asList(ranges));
 	}
 	
 	/**
@@ -81,6 +87,11 @@ public class TransientRangeProducer implements IRangeProducer {
 	 */
 	public void addRanges(Player player, List<ProtectionRange> ranges) {
 		rangeGroup.addRanges(player, ranges);
+		
+		if (!this.playerRanges.containsKey(player.getUniqueId())) {
+			this.playerRanges.put(player.getUniqueId(), new ArrayList<ProtectionRange>());
+		}
+		this.playerRanges.get(player.getUniqueId()).addAll(ranges);
 	}
 	
 	/**
@@ -92,6 +103,11 @@ public class TransientRangeProducer implements IRangeProducer {
 	 */
 	public void addRanges(Player player, long ticks, ProtectionRange... ranges) {
 		rangeGroup.addRanges(player, ranges);
+		
+		if (!this.playerRanges.containsKey(player.getUniqueId())) {
+			this.playerRanges.put(player.getUniqueId(), new ArrayList<ProtectionRange>());
+		}
+		this.playerRanges.get(player.getUniqueId()).addAll(Arrays.asList(ranges));
 		
 		// Queue later removal.
 		RemoveExpiredRangesTask task = new RemoveExpiredRangesTask(player, ranges);
@@ -108,6 +124,11 @@ public class TransientRangeProducer implements IRangeProducer {
 	 */
 	public void addRanges(Player player, long ticks, List<ProtectionRange> ranges) {
 		rangeGroup.addRanges(player, ranges);
+		
+		if (!this.playerRanges.containsKey(player.getUniqueId())) {
+			this.playerRanges.put(player.getUniqueId(), new ArrayList<ProtectionRange>());
+		}
+		this.playerRanges.get(player.getUniqueId()).addAll(ranges);
 		
 		// Queue later removal.
 		RemoveExpiredRangesTask task = new RemoveExpiredRangesTask(player, ranges);
@@ -153,8 +174,12 @@ public class TransientRangeProducer implements IRangeProducer {
 		
 		@Override
 		public void run() {
-			TransientRangeProducer.this.ranges.get(uuid).removeAll(
+			playerRanges.get(uuid).removeAll(
 					rangesToRemove);
+			Player player = Bukkit.getPlayer(uuid);
+			if (player != null) {
+				rangeGroup.setRanges(player, playerRanges.get(uuid));
+			}
 			// Remove this task from the list of active tasks
 			activeRemovalTasks.remove(this);
 		}
