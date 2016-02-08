@@ -82,7 +82,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private Map<String, Map<String, Integer>> worldEntityRanges 
 			= new HashMap<>();
 	
-	private BookCreator bookCreator;
 	private PermissionHandler permissionHandler;
 	
 	/**
@@ -122,7 +121,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
-		this.bookCreator = new BookCreator(this);
 		this.permissionHandler = new PermissionHandler(this);
 		
 		try {
