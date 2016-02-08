@@ -29,7 +29,7 @@ public class ConfigValidation {
 			"canCacheChunks", "canSaveEntities", "canSaveTileEntities", 
 			"canSaveContainers", "sendEntityRanges", "requestMessage",
 			//Main-config specific
-			"logMode", "per-world", "chunkOverrides");
+			"logMode", "requestDuration", "per-world", "chunkOverrides");
 	
 	/**
 	 * Validates the entire configuration.
@@ -45,6 +45,13 @@ public class ConfigValidation {
 		validateIsBool("canDoNewThings", section, warnTo);
 		validateIsBool("canDownloadInGeneral", section, warnTo);
 		validateIsInt("saveRadius", section, warnTo);
+		validateIsInt("requestDuration", section, warnTo);
+		if (section.getInt("requestDuration", 3600) <= 0) {
+			warnTo.sendMessage("§c[WDL] ERROR: Config setting wdl.request" +
+					"Duration is not valid!  It must be at least 1 second.  " +
+					"3600 seconds (1 hour) will be used instead!");
+			section.set("requestDuration", 3600);
+		}
 		validateIsBool("canCacheChunks", section, warnTo);
 		validateIsBool("canSaveEntities", section, warnTo);
 		validateIsBool("canSaveTileEntities", section, warnTo);

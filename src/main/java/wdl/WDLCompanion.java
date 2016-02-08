@@ -639,26 +639,28 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		rangeProducers.clear();
 		ConfigurationSection overrides = getConfig()
 				.getConfigurationSection("wdl.chunkOverrides");
-		Set<String> keys = overrides.getKeys(false);
-		for (String key : keys) {
-			ConfigurationSection override = overrides
-					.getConfigurationSection(key);
-			
-			IRangeGroupType<?> type = registeredRangeGroupTypes
-					.get(override.getString("type"));
-			
-			if (type == null) {
-				throw new AssertionError("Failed to get the group "
-						+ "type for ChunkOverride" + key + "!  "
-						+ "Tried to use " + override.getString("type")
-						+ ", but that was not found.");
+		if (overrides != null) {
+			Set<String> keys = overrides.getKeys(false);
+			for (String key : keys) {
+				ConfigurationSection override = overrides
+						.getConfigurationSection(key);
+				
+				IRangeGroupType<?> type = registeredRangeGroupTypes
+						.get(override.getString("type"));
+				
+				if (type == null) {
+					throw new AssertionError("Failed to get the group "
+							+ "type for ChunkOverride" + key + "!  "
+							+ "Tried to use " + override.getString("type")
+							+ ", but that was not found.");
+				}
+				
+				IRangeGroup group = new RangeGroup(key, this);
+				IRangeProducer producer = type.createRangeProducer(group,
+						override);
+				
+				rangeProducers.put(key, producer);
 			}
-			
-			IRangeGroup group = new RangeGroup(key, this);
-			IRangeProducer producer = type.createRangeProducer(group,
-					override);
-			
-			rangeProducers.put(key, producer);
 		}
 		
 		// Set up the range producer used with permission requests.
