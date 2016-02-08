@@ -12,6 +12,19 @@ wdl:
   # logs folder, subfolder 'WDL'.
   logMode: individual
   
+  # Time that an accepted permission request lasts for in seconds.  This is
+  # only counted after the request is accepted.  In a future update, you'll
+  # be able to also specify a custom duration with each request, but that's
+  # not currently possible.
+  # 
+  # Permission requests allow players to request permission to temporarilly
+  # use the mod.  They still require a server moderator or administrator to
+  # grant the player the permissions, but it simplifies the process because
+  # the player can specify exactly what permissions they want. 
+  # 
+  # 3600 seconds = 1 hour.
+  requestDuration: 3600
+  
   # Whether the client can use features of WDL that are from newer versions
   # than this plugin is aware of (essentially, this provides a default that
   # is used with unrecognized features).

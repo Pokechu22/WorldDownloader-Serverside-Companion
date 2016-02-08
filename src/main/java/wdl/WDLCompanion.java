@@ -31,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
@@ -499,10 +500,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						sender.sendMessage("Usage: /wdl requests accept <player> -- Approve <player>'s request");
 						return true;
 					}
-					PermissionRequest request = RequestManager.getPlayerRequest(args[2]);
+					final PermissionRequest request = RequestManager
+							.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
 						return true;
+					}
+					
+					if (request.state != PermissionRequest.State.WAITING) {
+						sender.sendMessage("§c" + args[2] + "'s request isn't " +
+								"in the right state to be accepted.");
 					}
 					
 					Player player = Bukkit.getPlayer(args[2]);
@@ -512,13 +519,23 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					
 					request.state = PermissionRequest.State.ACCEPTED;
-					sender.sendMessage("Accepted " + args[2] + "'s request.");
+					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
+					getLogger().info(request + " has been accepted.");
+					
+					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600); 
+					//TODO: Allow changing the amount of time a request lasts.
+					request.expirationTime = System.currentTimeMillis()
+							+ (durationSeconds * 1000);
+					
+					RequestCleanupTask task = new RequestCleanupTask(request);
+					request.expireTask = task.runTaskLater(this, durationSeconds * 20);
+					
 					if (request.requestedPerms.size() > 0) {
 						updatePlayer(player);
 					}
 					if (request.rangeRequests.size() > 0) {
 						requestRangeProducer.addRanges(player,
-								request.rangeRequests);
+								durationSeconds * 20, request.rangeRequests);
 					}
 					return true;
 				} else if (args[1].equals("reject")) {
@@ -898,5 +915,25 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		public final Player player;
 		public final String channel;
 		public final byte[] data;
+	}
+	
+	private class RequestCleanupTask extends BukkitRunnable {
+		public RequestCleanupTask(PermissionRequest request) {
+			this.request = request;
+		}
+		
+		public final PermissionRequest request;
+		
+		@Override
+		public void run() {
+			// Request has expired at this point.
+			request.state = PermissionRequest.State.EXPIRED;
+			Player player = Bukkit.getPlayer(request.playerId);
+			if (player != null) {
+				updatePlayer(player);
+			}
+			
+			getLogger().info(request + " has expired.");
+		}
 	}
 }

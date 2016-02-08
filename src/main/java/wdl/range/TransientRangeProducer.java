@@ -90,7 +90,7 @@ public class TransientRangeProducer implements IRangeProducer {
 	 * @param player The player to give the ranges to.
 	 * @param ranges The ranges.
 	 */
-	public void addRanges(Player player, int ticks, ProtectionRange... ranges) {
+	public void addRanges(Player player, long ticks, ProtectionRange... ranges) {
 		rangeGroup.addRanges(player, ranges);
 		
 		// Queue later removal.
@@ -106,7 +106,7 @@ public class TransientRangeProducer implements IRangeProducer {
 	 * @param player The player to give the ranges to.
 	 * @param ranges The ranges.
 	 */
-	public void addRanges(Player player, int ticks, List<ProtectionRange> ranges) {
+	public void addRanges(Player player, long ticks, List<ProtectionRange> ranges) {
 		rangeGroup.addRanges(player, ranges);
 		
 		// Queue later removal.

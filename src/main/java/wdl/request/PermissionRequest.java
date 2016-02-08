@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -29,14 +30,23 @@ public class PermissionRequest {
 		 */
 		ACCEPTED(ChatColor.GREEN),
 		/**
-		 * The request has been rejected by a moderator.  (Currently unused)
+		 * The request has been rejected by a moderator.
 		 */
 		REJECTED(ChatColor.RED),
 		/**
 		 * The request has been withdrawn by the submitting player (either
-		 * directly or by creating a new request).  (Currently unused)
+		 * directly or by creating a new request).
 		 */
-		WITHDRAWN(ChatColor.GRAY, ChatColor.ITALIC);
+		WITHDRAWN(ChatColor.GRAY, ChatColor.ITALIC, ChatColor.STRIKETHROUGH),
+		/**
+		 * The request has been revoked by a moderator after previously being
+		 * accepted.
+		 */
+		REVOKED(ChatColor.GRAY, ChatColor.STRIKETHROUGH),
+		/**
+		 * The request was accepted and has expired after being used.
+		 */
+		EXPIRED(ChatColor.GRAY, ChatColor.ITALIC);
 		
 		public final String prefix;
 		
@@ -55,7 +65,7 @@ public class PermissionRequest {
 	}
 	
 	/**
-	 * Current state of this request.
+	 * Current state of this permission request.
 	 */
 	public State state;
 	/**
@@ -78,6 +88,15 @@ public class PermissionRequest {
 	 * The ranges that were requested.
 	 */
 	public final List<ProtectionRange> rangeRequests;
+	/**
+	 * The time at which this request expires (in the format returned by
+	 * {@link System#currentTimeMillis()}).
+	 */
+	public long expirationTime;
+	/**
+	 * {@link BukkitTask} used to mark this request as expired.
+	 */
+	public BukkitTask expireTask;
 	
 	public PermissionRequest(Player player, String requestReason,
 			Map<String, String> requestedPerms,
