@@ -517,10 +517,21 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					
 					request.state = PermissionRequest.State.ACCEPTED;
-					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
-					getLogger().info(request + " has been accepted.");
 					
-					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600); 
+					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600);
+					
+					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
+					getLogger().info(request.playerName + "'s request has been accepted.");
+					getLogger().info("It will expire in " + durationSeconds + " seconds.");
+					getLogger().info("Permissions (" + request.requestedPerms.size() + "):");
+					for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
+						getLogger().info(" * " + e.getKey() + "=" + e.getValue());
+					}
+					getLogger().info("Ranges (" + request.rangeRequests.size() + "):");
+					for (ProtectionRange range : request.rangeRequests) {
+						getLogger().info(" * " + range);
+					}
+					
 					//TODO: Allow changing the amount of time a request lasts.
 					request.expirationTime = System.currentTimeMillis()
 							+ (durationSeconds * 1000);
