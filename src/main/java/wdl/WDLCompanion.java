@@ -430,7 +430,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 									+ args[2] + "' is not a number!");
 							return true;
 						}
-						if (page < 0) {
+						if (page <= 0) {
 							sender.sendMessage("§cInvalid page number: Must be greater than 0!");
 							return true;
 						}
