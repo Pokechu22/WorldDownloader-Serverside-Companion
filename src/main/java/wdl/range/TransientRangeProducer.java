@@ -150,6 +150,36 @@ public class TransientRangeProducer implements IRangeProducer {
 	}
 	
 	/**
+	 * Removes the specified player's download permission in the given ranges.
+	 * 
+	 * This removes ranges that were previously added; it <b>cannot</b> be used
+	 * to 'blacklist' specific ranges.
+	 * 
+	 * @param player The player remove the ranges fromt.
+	 * @param ranges The ranges.
+	 */
+	public void removeRanges(Player player, ProtectionRange... ranges) {
+		removeRanges(player, Arrays.asList(ranges));
+	}
+	
+	/**
+	 * Removes the specified player's download permission in the given ranges.
+	 * 
+	 * This removes ranges that were previously added; it <b>cannot</b> be used
+	 * to 'blacklist' specific ranges.
+	 * 
+	 * @param player The player remove the ranges fromt.
+	 * @param ranges The ranges.
+	 */
+	public void removeRanges(Player player, List<ProtectionRange> ranges) {
+		if (!this.playerRanges.containsKey(player.getUniqueId())) {
+			return;
+		}
+		this.playerRanges.get(player.getUniqueId()).removeAll(ranges);
+		rangeGroup.setRanges(player, playerRanges.get(player.getUniqueId()));
+	}
+	
+	/**
 	 * List of {@link RemoveExpiredRangesTask}s that are currently running.
 	 */
 	private List<RemoveExpiredRangesTask> activeRemovalTasks = new ArrayList<>();
