@@ -155,7 +155,7 @@ public class TransientRangeProducer implements IRangeProducer {
 	 * This removes ranges that were previously added; it <b>cannot</b> be used
 	 * to 'blacklist' specific ranges.
 	 * 
-	 * @param player The player remove the ranges fromt.
+	 * @param player The player remove the ranges from.
 	 * @param ranges The ranges.
 	 */
 	public void removeRanges(Player player, ProtectionRange... ranges) {
@@ -168,7 +168,7 @@ public class TransientRangeProducer implements IRangeProducer {
 	 * This removes ranges that were previously added; it <b>cannot</b> be used
 	 * to 'blacklist' specific ranges.
 	 * 
-	 * @param player The player remove the ranges fromt.
+	 * @param player The player remove the ranges from.
 	 * @param ranges The ranges.
 	 */
 	public void removeRanges(Player player, List<ProtectionRange> ranges) {
