@@ -548,8 +548,27 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					return true;
 				} else if (args[1].equals("reject")) {
-					sender.sendMessage("§cNot yet implemented - sorry :/");
-					return true;
+					if (args.length != 3) {
+						sender.sendMessage("/wdl requests reject <player> -- Deny <player>'s request.");
+						
+						return true;
+					}
+					final PermissionRequest request = RequestManager
+							.getPlayerRequest(args[2]);
+					if (request == null) {
+						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
+						return true;
+					}
+					
+					if (request.state != PermissionRequest.State.WAITING) {
+						sender.sendMessage("§c" + args[2] + "'s request isn't " +
+								"in the right state to be rejected.");
+						if (request.state == PermissionRequest.State.ACCEPTED) {
+							sender.sendMessage("§cUse /wdl requests revoke " +
+									"<player> to revoke an already-accepted " +
+									"request.");
+						}
+					}
 				}
 				
 				sender.sendMessage("§cUnknown requests subcommand '" + args[1]
