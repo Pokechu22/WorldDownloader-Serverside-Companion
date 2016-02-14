@@ -399,6 +399,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					sender.sendMessage("/wdl requests show <player> -- Show <player>'s request, if present.");
 					sender.sendMessage("/wdl requests accept <player> -- Approve <player>'s request.");
 					sender.sendMessage("/wdl requests reject <player> -- Deny <player>'s request.");
+					sender.sendMessage("/wdl requests revoke <player> -- Revoke <player>'s request after it has already been accepted.");
 					return true;
 				}
 				// Aliases
@@ -569,6 +570,40 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 									"request.");
 						}
 					}
+				} else if (args[1].equals("revoke")) {
+					if (args.length != 3) {
+						sender.sendMessage("/wdl requests revoke <player> -- Revoke <player>'s request after it has already been accepted.");
+						
+						return true;
+					}
+					final PermissionRequest request = RequestManager
+							.getPlayerRequest(args[2]);
+					if (request == null) {
+						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
+						return true;
+					}
+					
+					if (request.state != PermissionRequest.State.ACCEPTED) {
+						sender.sendMessage("§c" + args[2] + "'s request isn't " +
+								"in the right state to be revoked.");
+						if (request.state == PermissionRequest.State.WAITING) {
+							sender.sendMessage("§cUse /wdl requests reject " +
+									"<player> to reject a non-accepted " +
+									"request.");
+						}
+					}
+					
+					request.state = PermissionRequest.State.REVOKED;
+					
+					if (request.expireTask != null) {
+						request.expireTask.cancel();
+					}
+					
+					Player player = Bukkit.getPlayer(request.playerId);
+					updatePlayer(player);
+					requestRangeProducer.removeRanges(player, request.rangeRequests);
+					
+					return true;
 				}
 				
 				sender.sendMessage("§cUnknown requests subcommand '" + args[1]
