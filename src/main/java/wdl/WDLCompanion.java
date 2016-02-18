@@ -31,7 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
@@ -88,7 +87,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 * A transient range producer to store ranges from accepted permission
 	 * requests.
 	 */
-	private TransientRangeProducer requestRangeProducer;
+	public TransientRangeProducer requestRangeProducer;
 	
 	/**
 	 * Map of all registered {@link IRangeGroupType}s by their IDs.
@@ -519,34 +518,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					
 					request.state = PermissionRequest.State.ACCEPTED;
 					
+					//TODO: Add an argument to change this time.
 					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600);
 					
 					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
-					getLogger().info(request.playerName + "'s request has been accepted.");
-					getLogger().info("It will expire in " + durationSeconds + " seconds.");
-					getLogger().info("Permissions (" + request.requestedPerms.size() + "):");
-					for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
-						getLogger().info(" * " + e.getKey() + "=" + e.getValue());
-					}
-					getLogger().info("Ranges (" + request.rangeRequests.size() + "):");
-					for (ProtectionRange range : request.rangeRequests) {
-						getLogger().info(" * " + range);
-					}
-					
-					//TODO: Allow changing the amount of time a request lasts.
-					request.expirationTime = System.currentTimeMillis()
-							+ (durationSeconds * 1000);
-					
-					RequestCleanupTask task = new RequestCleanupTask(request);
-					request.expireTask = task.runTaskLater(this, durationSeconds * 20);
-					
-					if (request.requestedPerms.size() > 0) {
-						updatePlayer(player);
-					}
-					if (request.rangeRequests.size() > 0) {
-						requestRangeProducer.addRanges(player,
-								durationSeconds * 20, request.rangeRequests);
-					}
+					RequestManager.acceptRequest(durationSeconds, request, this);
 					return true;
 				} else if (args[1].equals("reject")) {
 					if (args.length != 3) {
@@ -554,7 +530,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						
 						return true;
 					}
-					final PermissionRequest request = RequestManager
+					PermissionRequest request = RequestManager
 							.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
@@ -570,13 +546,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 									"request.");
 						}
 					}
+					
+					RequestManager.rejectRequest(request, this);
+					return true;
 				} else if (args[1].equals("revoke")) {
 					if (args.length != 3) {
 						sender.sendMessage("/wdl requests revoke <player> -- Revoke <player>'s request after it has already been accepted.");
 						
 						return true;
 					}
-					final PermissionRequest request = RequestManager
+					PermissionRequest request = RequestManager
 							.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
@@ -593,15 +572,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						}
 					}
 					
-					request.state = PermissionRequest.State.REVOKED;
-					
-					if (request.expireTask != null) {
-						request.expireTask.cancel();
-					}
-					
-					Player player = Bukkit.getPlayer(request.playerId);
-					updatePlayer(player);
-					requestRangeProducer.removeRanges(player, request.rangeRequests);
+					RequestManager.revokeRequest(request, this);
 					
 					return true;
 				}
@@ -980,25 +951,5 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		public final Player player;
 		public final String channel;
 		public final byte[] data;
-	}
-	
-	private class RequestCleanupTask extends BukkitRunnable {
-		public RequestCleanupTask(PermissionRequest request) {
-			this.request = request;
-		}
-		
-		public final PermissionRequest request;
-		
-		@Override
-		public void run() {
-			// Request has expired at this point.
-			request.state = PermissionRequest.State.EXPIRED;
-			Player player = Bukkit.getPlayer(request.playerId);
-			if (player != null) {
-				updatePlayer(player);
-			}
-			
-			getLogger().info(request + " has expired.");
-		}
 	}
 }
