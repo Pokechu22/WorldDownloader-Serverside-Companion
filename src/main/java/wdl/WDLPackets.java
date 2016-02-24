@@ -14,6 +14,11 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
+/**
+ * Reads and writes WDL plugin channel packets.  The structures of these
+ * packets are documented
+ * <a href="http://wiki.vg/User:Pokechu22/World_downloader">on wiki.vg</a>.
+ */
 public class WDLPackets {
 
 	/**
