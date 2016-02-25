@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -286,6 +288,30 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	public void registerRanges(RangeGroupTypeRegistrationEvent event) {
 		event.addRegistration("BlockRange", new BlockRangeGroupType());
 		event.addRegistration("ChunkRange", new ChunkRangeGroupType());
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command,
+			String alias, String[] args) {
+		if (command.getName().equals("wdl")) {
+			if (args.length <= 1) {
+				List<String> base = Arrays.asList("updateme", "reload",
+						"update", "updateall", "requests");
+				if (args.length == 0) {
+					return base;
+				}
+				
+				Iterator<String> itr = base.iterator();
+				while (itr.hasNext()) {
+					if (!itr.next().toLowerCase()
+							.startsWith(args[0].toLowerCase())) {
+						itr.remove();
+					}
+				}
+				return base;
+			}
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("deprecation")
