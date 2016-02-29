@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -301,17 +300,35 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					return base;
 				}
 				
-				Iterator<String> itr = base.iterator();
-				while (itr.hasNext()) {
-					if (!itr.next().toLowerCase()
-							.startsWith(args[0].toLowerCase())) {
-						itr.remove();
+				return tabLimit(base, args[0]);
+			}
+			if (args.length == 2) {
+				if (args[0].equals("update")) {
+					List<String> names = new ArrayList<>();
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						names.add(player.getName());
 					}
+					return tabLimit(names, args[1]);
 				}
-				return base;
 			}
 		}
-		return null;
+		return new ArrayList<>();
+	}
+	
+	/**
+	 * Tab-limits the given list of strings, returning only values that
+	 * start with second parameter.
+	 */
+	private List<String> tabLimit(List<String> values, String start) {
+		List<String> returned = new ArrayList<>();
+		
+		for (String s : values) {
+			if (s.startsWith(start)) {
+				returned.add(s);
+			}
+		}
+		
+		return returned;
 	}
 	
 	@SuppressWarnings("deprecation")
