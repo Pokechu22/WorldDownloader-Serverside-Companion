@@ -42,27 +42,27 @@ public class RequestManager {
 						request.playerName + " overwrote their old request.");
 				plugin.getLogger().info("Their old request was in state " + oldRequest.state);
 				plugin.getLogger().info("It would expire at " + oldRequest.expirationTime);
-				plugin.getLogger().info("Permissions (" + request.requestedPerms.size() + "):");
-				for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
+				plugin.getLogger().info("Permissions (" + oldRequest.requestedPerms.size() + "):");
+				for (Map.Entry<String, String> e : oldRequest.requestedPerms.entrySet()) {
 					plugin.getLogger().info(" * " + e.getKey() + "=" + e.getValue());
 				}
-				plugin.getLogger().info("Ranges (" + request.rangeRequests.size() + "):");
-				for (ProtectionRange range : request.rangeRequests) {
+				plugin.getLogger().info("Ranges (" + oldRequest.rangeRequests.size() + "):");
+				for (ProtectionRange range : oldRequest.rangeRequests) {
 					plugin.getLogger().info(" * " + range);
 				}
 				
 				if (oldRequest.state == PermissionRequest.State.WAITING
 						|| oldRequest.state == PermissionRequest.State.ACCEPTED) {
-					player.sendMessage("You withdrew your old permission request.");
+					player.sendMessage("[WDL] You withdrew your old permission request.");
 					oldRequest.state = PermissionRequest.State.WITHDRAWN;
 				}
 				
-				if (request.expireTask != null) {
-					request.expireTask.cancel();
-				}
-				
 				plugin.updatePlayer(player);
-				plugin.requestRangeProducer.removeRanges(player, request.rangeRequests);
+				plugin.requestRangeProducer.removeRanges(player, oldRequest.rangeRequests);
+			}
+			
+			if (oldRequest.expireTask != null) {
+				oldRequest.expireTask.cancel();
 			}
 		}
 		
@@ -143,13 +143,16 @@ public class RequestManager {
 		RequestCleanupTask task = new RequestCleanupTask(request, plugin);
 		request.expireTask = task.runTaskLater(plugin, durationSeconds * 20);
 		
+		Player player = Bukkit.getPlayer(request.playerId);
 		if (request.requestedPerms.size() > 0) {
-			plugin.updatePlayer(Bukkit.getPlayer(request.playerId));
+			plugin.updatePlayer(player);
 		}
 		if (request.rangeRequests.size() > 0) {
-			plugin.requestRangeProducer.addRanges(Bukkit.getPlayer(request.playerId),
+			plugin.requestRangeProducer.addRanges(player,
 					durationSeconds * 20, request.rangeRequests);
 		}
+		
+		player.sendMessage("§a[WDL] Your permission request has been accepted!");
 	}
 	
 	public static void rejectRequest(PermissionRequest request, WDLCompanion plugin) {
@@ -159,6 +162,11 @@ public class RequestManager {
 		}
 		
 		request.state = PermissionRequest.State.REJECTED;
+		
+		Player player = Bukkit.getPlayer(request.playerId);
+		if (player != null) {
+			player.sendMessage("§c[WDL] Your permission request has been rejected!");
+		}
 	}
 	
 	public static void revokeRequest(PermissionRequest request, WDLCompanion plugin) {
@@ -174,8 +182,12 @@ public class RequestManager {
 		}
 		
 		Player player = Bukkit.getPlayer(request.playerId);
-		plugin.updatePlayer(player);
-		plugin.requestRangeProducer.removeRanges(player, request.rangeRequests);
+		if (player != null) {
+			plugin.updatePlayer(player);
+			plugin.requestRangeProducer.removeRanges(player, request.rangeRequests);
+			
+			player.sendMessage("§c[WDL] Your permission request has been revoked!");
+		}
 	}
 	
 	private static class RequestCleanupTask extends BukkitRunnable {
