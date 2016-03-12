@@ -57,11 +57,6 @@ public class PermissionRequest {
 			}
 			prefix = builder.toString();
 		}
-		
-		@Override
-		public String toString() {
-			return prefix;
-		}
 	}
 	
 	/**
