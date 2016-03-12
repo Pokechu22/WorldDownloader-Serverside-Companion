@@ -310,6 +310,23 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					return tabLimit(names, args[1]);
 				}
+				if (args[0].equals("requests")) {
+					return tabLimit(Arrays.asList("list", "show",
+							"accept", "reject", "revoke"), args[1]);
+				}
+			}
+			if (args.length == 3) {
+				if (args[0].equals("requests")) {
+					if (args[1].equals("show") || args[1].equals("accept")
+							|| args[1].equals("reject")
+							|| args[1].equals("revoke")) {
+						List<String> names = new ArrayList<>();
+						for (Player player : Bukkit.getOnlinePlayers()) {
+							names.add(player.getName());
+						}
+						return tabLimit(names, args[2]);
+					}
+				}
 			}
 		}
 		return new ArrayList<>();
