@@ -690,7 +690,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			PermissionRequest request = WDLPackets.readPermissionRequest(player, data);
 			
 			// TODO: An event, maybe?
-			RequestManager.addRequest(request);
+			RequestManager.addRequest(request, this);
 		}
 	}
 

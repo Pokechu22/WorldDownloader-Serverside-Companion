@@ -33,9 +33,53 @@ public class RequestManager {
 	 */
 	private static Map<UUID, PermissionRequest> requestsById = new HashMap<>();
 	
-	public static void addRequest(PermissionRequest request) {
+	public static void addRequest(PermissionRequest request, WDLCompanion plugin) {
+		if (requestsById.containsKey(request.playerId)) {
+			PermissionRequest oldRequest = requestsById.get(request.playerId);
+			Player player = Bukkit.getPlayer(oldRequest.playerId);
+			if (player != null) {
+				plugin.getLogger().info(
+						request.playerName + " overwrote their old request.");
+				plugin.getLogger().info("Their old request was in state " + oldRequest.state);
+				plugin.getLogger().info("It would expire at " + oldRequest.expirationTime);
+				plugin.getLogger().info("Permissions (" + request.requestedPerms.size() + "):");
+				for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
+					plugin.getLogger().info(" * " + e.getKey() + "=" + e.getValue());
+				}
+				plugin.getLogger().info("Ranges (" + request.rangeRequests.size() + "):");
+				for (ProtectionRange range : request.rangeRequests) {
+					plugin.getLogger().info(" * " + range);
+				}
+				
+				if (oldRequest.state == PermissionRequest.State.WAITING
+						|| oldRequest.state == PermissionRequest.State.ACCEPTED) {
+					player.sendMessage("You withdrew your old permission request.");
+					oldRequest.state = PermissionRequest.State.WITHDRAWN;
+				}
+				
+				if (request.expireTask != null) {
+					request.expireTask.cancel();
+				}
+				
+				plugin.updatePlayer(player);
+				plugin.requestRangeProducer.removeRanges(player, request.rangeRequests);
+			}
+		}
+		
 		requestsByName.put(request.playerName.toLowerCase(), request);
 		requestsById.put(request.playerId, request);
+		
+		plugin.getLogger().info(
+				request.playerName + " submitted a new permission request.");
+		plugin.getLogger().info("Request reason: " + request.requestReason);
+		plugin.getLogger().info("Permissions (" + request.requestedPerms.size() + "):");
+		for (Map.Entry<String, String> e : request.requestedPerms.entrySet()) {
+			plugin.getLogger().info(" * " + e.getKey() + "=" + e.getValue());
+		}
+		plugin.getLogger().info("Ranges (" + request.rangeRequests.size() + "):");
+		for (ProtectionRange range : request.rangeRequests) {
+			plugin.getLogger().info(" * " + range);
+		}
 	}
 	
 	/**
