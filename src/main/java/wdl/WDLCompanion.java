@@ -551,6 +551,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					if (request.state != PermissionRequest.State.WAITING) {
 						sender.sendMessage("§c" + args[2] + "'s request isn't " +
 								"in the right state to be accepted.");
+						return true;
 					}
 					
 					Player player = Bukkit.getPlayer(args[2]);
@@ -558,8 +559,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						sender.sendMessage("§cPlayer '" + args[2] + "' isn't online.");
 						return true;
 					}
-					
-					request.state = PermissionRequest.State.ACCEPTED;
 					
 					//TODO: Add an argument to change this time.
 					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600);
@@ -588,6 +587,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 									"<player> to revoke an already-accepted " +
 									"request.");
 						}
+						return true;
 					}
 					
 					RequestManager.rejectRequest(request, this);
@@ -613,6 +613,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 									"<player> to reject a non-accepted " +
 									"request.");
 						}
+						return true;
 					}
 					
 					RequestManager.revokeRequest(request, this);
