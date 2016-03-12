@@ -580,8 +580,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					//TODO: Add an argument to change this time.
 					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600);
 					
-					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
 					RequestManager.acceptRequest(durationSeconds, request, this);
+					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
+					
 					return true;
 				} else if (args[1].equals("reject")) {
 					if (args.length != 3) {
@@ -608,6 +609,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					
 					RequestManager.rejectRequest(request, this);
+					sender.sendMessage("§aRejected " + args[2] + "'s request.");
 					return true;
 				} else if (args[1].equals("revoke")) {
 					if (args.length != 3) {
@@ -634,6 +636,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					}
 					
 					RequestManager.revokeRequest(request, this);
+					sender.sendMessage("§aRevoked " + args[2] + "'s request.");
 					
 					return true;
 				}
