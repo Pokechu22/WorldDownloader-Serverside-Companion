@@ -339,8 +339,9 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private List<String> tabLimit(List<String> values, String start) {
 		List<String> returned = new ArrayList<>();
 		
+		start = start.toLowerCase();
 		for (String s : values) {
-			if (s.startsWith(start)) {
+			if (s.toLowerCase().startsWith(start)) {
 				returned.add(s);
 			}
 		}
