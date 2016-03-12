@@ -201,36 +201,6 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			sendEntityRangesGraph.addPlotter(new ConfigBooleanPlotter(
 					"wdl.sendEntityRanges"));
 
-			Graph usingPlayers = metrics.createGraph("usingPlayers");
-			usingPlayers.addPlotter(new Plotter("Does not have WDL installed") {
-				@Override
-				public int getValue() {
-					int nonRunning = 0;
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (!player.getListeningPluginChannels().contains(
-								INIT_CHANNEL_NAME)) {
-							nonRunning++;
-						}
-					}
-
-					return nonRunning;
-				}
-			});
-			usingPlayers.addPlotter(new Plotter("Has WDL installed") {
-				@Override
-				public int getValue() {
-					int running = 0;
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.getListeningPluginChannels().contains(
-								INIT_CHANNEL_NAME)) {
-							running++;
-						}
-					}
-
-					return running;
-				}
-			});
-
 			metrics.start();
 		} catch (IOException e) {
 			getLogger().warning("Failed to start PluginMetrics :(");
