@@ -1,12 +1,9 @@
 name: WDLCompanion
 main: wdl.WDLCompanion
-version: 1.0.4
+version: 1.1.0
 author: Pokechu22
 website: https://github.com/Pokechu22/WorldDownloader-Serverside-Companion
-description: |
-  This plugin provides a set of permissions that control what WorldDownloader
-  (a mod that downloads a Minecraft world on a server; also known as WDL) may
-  download.
+description: This plugin provides a set of permissions that control what World Downloader (https://github.com/pokechu22/WorldDownloader), a mod that allows downloading portions of a multiplayer world for singleplayer use, may download.
 
 
 commands: 
