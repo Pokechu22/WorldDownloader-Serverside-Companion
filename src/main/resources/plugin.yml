@@ -39,8 +39,9 @@ permissions:
     default: op
     description:
       If a player has this permission, they can use "/wdl requests" to manage
-      permission requests from other players on this server (or, if it is set
-      up, other servers in this bungeecord cluster).
+      permission requests from other players on this server.  All players are
+      allowed to request permissions, including players that do not have this
+      permission.
   #Override permissions
   wdl.overrideCanDoNewThings: 
     default: op
