@@ -19,20 +19,27 @@ commands:
     
 
 permissions:
-  #Utility permissions.
-  wdl.reloadConfig: 
+  wdl.admin.*:
+    default: op
+    description:
+      Gives an admin the permission to use all admin-based "/wdl" subcommands
+    children:
+      wdl.admin.reloadConfig: true
+      wdl.admin.updatePlayer: true
+      wdl.admin.handleRequests: true
+  wdl.admin.reloadConfig: 
     default: op
     description: 
       If a player has this permission, they can use "/wdl reload" to manually
       reload the configuration without restarting the server.
-  wdl.updatePlayer: 
+  wdl.admin.updatePlayer: 
     default: op
     description: 
       If a player has this permission, they can use "/wdl update" to update a
       different player's permissions.  (Any player can use "/wdl updateme" to
       update their own permissions, even without this permission).  This perm
       also allows access to "/wdl updateall".
-  wdl.handleRequests:
+  wdl.admin.handleRequests:
     default: op
     description:
       If a player has this permission, they can use "/wdl requests" to manage
@@ -40,37 +47,49 @@ permissions:
       allowed to request permissions, including players that do not have this
       permission.
   #Override permissions
-  wdl.overrideCanDoNewThings: 
+  wdl.override.*:
+    default: op
+    description: Grants a player all of the override permissions.
+    children:
+      wdl.override.canDoNewThings: true
+      wdl.override.canDownloadInGeneral: true
+      wdl.override.maxSaveRadius: true
+      wdl.override.canCacheChunks: true
+      wdl.override.canSaveEntities: true
+      wdl.override.canSaveTileEntities: true
+      wdl.override.canSaveContainers: true
+      wdl.override.sendEntityRanges: true
+  wdl.override.canDoNewThings: 
     default: op
     description: |
       If a player has this permission, they are allowed to use functions that
       are not known to this plugin regardless of the value of what is set for
       "wdl.canDoNewThings" in the config.
-  wdl.overrideCanDownloadInGeneral: 
+  wdl.override.canDownloadInGeneral: 
     default: op
     description: |
       If a player has this permission, they are allowed to download the world
       regardless of the value of "wdl.canDownloadInGeneral" in the config.
-  wdl.overrideSaveRadius: 
+  wdl.override.maxSaveRadius: 
     default: op
     description: |
       If a player has this permission, they are allowed to download chunks at
       the full server chunk view distance regardless of what the config value
       is for "wdl.saveRadius".  (Note that this is only used if the player is
       not allowed to cache chunks!)
-  wdl.overrideCanCacheChunks: 
+  wdl.override.canCacheChunks: 
     default: op
     description: |
       If a player has this permission, they are allowed to cache chunks (thus
       allowing them to save the entire map easily) regardless of the value of
       "wdl.canCacheChunks" in the config.
-  wdl.overrideCanSaveEntities: 
+  wdl.override.canSaveEntities: 
     default: op
     description: |
       If a player has this permission, they are allowed to save entities such
       as animals, monsters, and minecart chests throughout the map regardless
       of the value of the config setting "wdl.canSaveEntities".
-  wdl.overrideCanSaveTileEntities: 
+  wdl.override.canSaveTileEntities: 
     default: op
     description: |
       If a player has this permission, they are allowed to save tile entities
@@ -79,8 +98,8 @@ permissions:
       config's setting "wdl.canSaveTileEntities" says.  This only covers tile
       entities that do not require a player to open a GUI to receive the data
       (so chests and similar containers require a second permission, which is
-      useless without this one -- "wdl.overrideCanSaveContainers").
-  wdl.overrideCanSaveContainers: 
+      useless without this one -- "wdl.override.canSaveContainers").
+  wdl.override.canSaveContainers: 
     default: op
     description: |
       If a player has both this permission and the more general permission of
@@ -88,10 +107,10 @@ permissions:
       entities that require opening to load the contents (containers) such as
       chests, furnaces, hoppers, brewing stands, and beacons, even if such is
       disabled in the config with "wdl.canSaveContainers" set to "false".
-  wdl.overrideSendEntityRanges:
+  wdl.override.sendEntityRanges:
     default: op
     description: |
       If a player has this permission, and the server runs spigot, the ranges
       at which various entities are tracked will be sent to them.  The config
       explains why WDL needs this data.  The player must also have permission
-      to save entities (wdl.overrideCanSaveEntities) for this to take effect.
+      to save entities ("wdl.override.canSaveEntities") for this to be used.

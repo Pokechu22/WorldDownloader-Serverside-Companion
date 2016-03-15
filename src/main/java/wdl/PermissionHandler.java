@@ -24,7 +24,7 @@ public class PermissionHandler {
 	 * Can the given player download at all in all chunks?
 	 */
 	public boolean getCanDownloadInGeneral(Player player) {
-		if (player.hasPermission("wdl.overrideCanDownloadInGeneral")) {
+		if (player.hasPermission("wdl.override.canDownloadInGeneral")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "downloadInGeneral")) {
@@ -38,7 +38,7 @@ public class PermissionHandler {
 	 * Can the given player cache chunks as they move about the world?
 	 */
 	public boolean getCanCacheChunks(Player player) {
-		if (player.hasPermission("wdl.overrideCanCacheChunks")) {
+		if (player.hasPermission("wdl.override.canCacheChunks")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "cacheChunks")) {
@@ -52,7 +52,7 @@ public class PermissionHandler {
 	 * Can the given player save entities?
 	 */
 	public boolean getCanSaveEntities(Player player) {
-		if (player.hasPermission("wdl.overrideCanSaveEntities")) {
+		if (player.hasPermission("wdl.override.canSaveEntities")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "saveEntities")) {
@@ -66,7 +66,7 @@ public class PermissionHandler {
 	 * Can the given player save tile entities?
 	 */
 	public boolean getCanSaveTileEntities(Player player) {
-		if (player.hasPermission("wdl.overrideCanSaveTileEntities")) {
+		if (player.hasPermission("wdl.override.canSaveTileEntities")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "saveTileEntities")) {
@@ -80,7 +80,7 @@ public class PermissionHandler {
 	 * Can the given player save containers (e.g. chests)?
 	 */
 	public boolean getCanSaveContainers(Player player) {
-		if (player.hasPermission("wdl.overrideCanSaveContainers")) {
+		if (player.hasPermission("wdl.override.canSaveContainers")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "saveContainers")) {
@@ -95,7 +95,7 @@ public class PermissionHandler {
 	 * released when this version was released?
 	 */
 	public boolean getCanDoNewThings(Player player) {
-		if (player.hasPermission("wdl.overrideCanDoNewThings")) {
+		if (player.hasPermission("wdl.override.canDoNewThings")) {
 			return true;
 		}
 		// No request value for this. 
@@ -107,7 +107,7 @@ public class PermissionHandler {
 	 * Should the given player receive entity range data?
 	 */
 	public boolean getSendEntityRanges(Player player) {
-		if (player.hasPermission("wdl.overrideSendEntityRanges")) {
+		if (player.hasPermission("wdl.override.sendEntityRanges")) {
 			return true;
 		}
 		if (getRequestedBoolean(player, "getEntityRanges")) {
@@ -123,7 +123,7 @@ public class PermissionHandler {
 	 * 
 	 */
 	public int getSaveRadius(Player player) {
-		if (player.hasPermission("wdl.overrideSaveRadius")) {
+		if (player.hasPermission("wdl.override.maxSaveRadius")) {
 			return -1;
 		}
 		

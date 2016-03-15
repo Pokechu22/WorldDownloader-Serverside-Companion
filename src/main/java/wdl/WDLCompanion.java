@@ -352,7 +352,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("reload")) {
-				if (!sender.hasPermission("wdl.reloadConfig")) {
+				if (!sender.hasPermission("wdl.admin.reloadConfig")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -371,7 +371,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("update")) {
-				if (!sender.hasPermission("wdl.updatePlayer")) {
+				if (!sender.hasPermission("wdl.admin.updatePlayer")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -403,7 +403,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("updateall")) {
-				if (!sender.hasPermission("wdl.updatePlayer")) {
+				if (!sender.hasPermission("wdl.admin.updatePlayer")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
@@ -419,7 +419,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			}
 			
 			if (args[0].equals("requests")) {
-				if (!sender.hasPermission("wdl.handleRequests")) {
+				if (!sender.hasPermission("wdl.admin.handleRequests")) {
 					sender.sendMessage("§cYou don't have permission!");
 					return true;
 				}
