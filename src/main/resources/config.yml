@@ -1,7 +1,8 @@
 # WorldDownloader Serverside Companion configuration file.
 # 
 # There are permissions that override each of these settings, by the name
-# of "wdl.overrideXXX".  They are given to ops by default.
+# of "wdl.override.XXX".  They are given to ops by default.  You can also
+# also use "wdl.override.*" to use all of these permissions at once.
 
 wdl:
   # Mode used for WDL-specific logging.  Valid options are 'none' (disables
@@ -88,39 +89,49 @@ wdl:
   # left unset, as it will create clutter.
   requestMessage: ""
 
-  # Overrides for specific chunks can be created here.  In these overrides,
-  # the value of 'whitelist' controls the behavior.  If it is set to false,
-  # no downloading may occur within that chunk, even if it would usually be
-  # allowed based off of the other settings.  Similarly, if it is true, all
-  # downloading may occur, even if the other settings are disabled.
+  # Chunk overrides can be used to give players download permission in only
+  # a specific set of chunks.  This can be used to give permission for some
+  # areas of the map only.
   # 
-  # The structure is a mapping.  The key of the mapping is, in general, not
-  # used (the only purpose is to help with debug output).  Inside, the type
-  # value is used to control what the behavior is.  The current options are
-  # 'ChunkRange' and 'BlockRange'.  For both of these, the whitelist option
-  # controls whitelisting, and then there are coordinates.  For ChunkRange,
-  # these are chunk coordinates (found in F3), while BlockRange uses single
-  # block coordinates.
+  # The names of the sections (for instance, 'example1' and 'example2') are
+  # used in logging and also displayed in-game.  Aditionally, overrides may
+  # have tags, which are more useful for groups that contain more than just
+  # one override.  These also show up in-game, but matter less.  For simple
+  # single-range override, this is mostly uneeded.
+  # 
+  # There are various types of ranges, and extension plugins can define new
+  # types.  The built-in types are BlockRange and ChunkRange.  Both of them
+  # are for rectangular regions, with block coordinates used on BlockRanges
+  # and chunk coordinates (visible in F3) used with ChunkRanges.  Note that
+  # block ranges are expanded to full-chunk areas (since WDL saves on a per
+  # chunk basis), so any area will be expanded to the chunk boundary.
+  # 
+  # Both BlockRange and ChunkRange also have an optional 'world' parameter,
+  # used to specify the name of the world.  If left unspecified, it applies
+  # to ALL worlds.  They also have a 'tag' parameter, which sets the tag as
+  # described earlier. 
   chunkOverrides:
   #Example below:
   #  example1:
   #    type: ChunkRange
-  #    whitelist: true
+  #    tag: foo
   #    x1: 5
-  #    y1: 7
+  #    z1: 7
   #    x2: 200
-  #    y2: 126
+  #    z2: 126
   #  example2:
   #    type: BlockRange
-  #    whitelist: false
+  #    world: world_nether
   #    x1: 100
-  #    y1: 4
+  #    z1: 4
   #    x2: 10
-  #    y2: 126
+  #    z2: 126
 
   # Per-world configuration goes here.  If a value isn't specified in world
   # world configuration, it uses the default values above.  World names are
-  # based off of the folder name.
+  # based off of the folder name.  Note that chunk overrides cannot be used
+  # in this section; depending on the the override, you can set which world
+  # is used with a 'world' key.
   per-world: 
   # Example is below.
   #
