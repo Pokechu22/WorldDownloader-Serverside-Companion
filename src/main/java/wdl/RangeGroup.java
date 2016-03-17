@@ -494,12 +494,6 @@ class RangeGroup implements IRangeGroup {
 			finalRanges.addAll(newRanges);
 		}
 		
-		
-		// TODO: Temporary logging.
-		plugin.getLogger().info(
-				"Compacted " + ranges.size() + " ranges into "
-						+ finalRanges.size());
-		
 		return finalRanges;
 	}
 	
