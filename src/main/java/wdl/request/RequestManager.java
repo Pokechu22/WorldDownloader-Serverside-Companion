@@ -144,6 +144,9 @@ public class RequestManager {
 		request.expireTask = task.runTaskLater(plugin, durationSeconds * 20);
 		
 		Player player = Bukkit.getPlayer(request.playerId);
+
+		request.state = PermissionRequest.State.ACCEPTED;
+
 		if (request.requestedPerms.size() > 0) {
 			plugin.updatePlayer(player);
 		}
@@ -152,7 +155,6 @@ public class RequestManager {
 					durationSeconds * 20, request.rangeRequests);
 		}
 		
-		request.state = PermissionRequest.State.ACCEPTED;
 		player.sendMessage("§a[WDL] Your permission request has been accepted!");
 	}
 	
