@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * 
  * This data is NOT stored anywhere and will disappear on a server reload.
  * 
- * TODO: This creates a lot of events - is that a bad thing?
+ * TODO: This creates a lot of tasks - is that a bad thing?
  */
 public class TransientRangeProducer implements IRangeProducer {
 	private final IRangeGroup rangeGroup;
