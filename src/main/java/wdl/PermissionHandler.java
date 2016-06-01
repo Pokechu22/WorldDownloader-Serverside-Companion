@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import org.bukkit.entity.Player;
 
 import wdl.request.PermissionRequest;
-import wdl.request.RequestManager;
 
 /**
  * Handles checking if a player has permission.
@@ -127,7 +126,7 @@ public class PermissionHandler {
 			return -1;
 		}
 		
-		PermissionRequest request = RequestManager.getPlayerRequest(player);
+		PermissionRequest request = plugin.requestManager.getPlayerRequest(player);
 		if (request != null) {
 			if (request.state == PermissionRequest.State.ACCEPTED) {
 				String result = request.requestedPerms.get("saveRadius");
@@ -180,7 +179,7 @@ public class PermissionHandler {
 	 * was accepted, returns true.
 	 */
 	private boolean getRequestedBoolean(Player player, String key) {
-		PermissionRequest request = RequestManager.getPlayerRequest(player);
+		PermissionRequest request = plugin.requestManager.getPlayerRequest(player);
 		if (request == null) {
 			return false;
 		}

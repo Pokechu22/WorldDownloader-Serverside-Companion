@@ -82,7 +82,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	private Map<String, Map<String, Integer>> worldEntityRanges 
 			= new HashMap<>();
 	
-	private PermissionHandler permissionHandler;
+	public PermissionHandler permissionHandler;
+	public RequestManager requestManager;
 	
 	/**
 	 * A transient range producer to store ranges from accepted permission
@@ -122,6 +123,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
 		this.permissionHandler = new PermissionHandler(this);
+		this.requestManager = new RequestManager(this);
 		
 		try {
 			class ConfigBooleanPlotter extends Plotter {
@@ -445,7 +447,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					int page = 1;
 					final int NUM_PER_PAGE = 8;
 					
-					List<PermissionRequest> requests = RequestManager.getRequests();
+					List<PermissionRequest> requests = requestManager.getRequests();
 					int numPages = (int) Math.ceil(requests.size()
 							/ (float)NUM_PER_PAGE);
 					
@@ -505,7 +507,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						sender.sendMessage("Usage: /wdl requests show <player> -- Show <player>'s request, if present.");
 						return true;
 					}
-					PermissionRequest request = RequestManager.getPlayerRequest(args[2]);
+					PermissionRequest request = requestManager.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
 						return true;
@@ -529,7 +531,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						sender.sendMessage("Usage: /wdl requests accept <player> -- Approve <player>'s request");
 						return true;
 					}
-					final PermissionRequest request = RequestManager
+					final PermissionRequest request = requestManager
 							.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
@@ -551,7 +553,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					//TODO: Add an argument to change this time.
 					long durationSeconds = getConfig().getLong("wdl.requestDuration", 3600);
 					
-					RequestManager.acceptRequest(durationSeconds, request, this);
+					requestManager.acceptRequest(durationSeconds, request);
 					sender.sendMessage("§aAccepted " + args[2] + "'s request.");
 					
 					return true;
@@ -561,8 +563,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						
 						return true;
 					}
-					PermissionRequest request = RequestManager
-							.getPlayerRequest(args[2]);
+					PermissionRequest request = requestManager.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
 						return true;
@@ -579,7 +580,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						return true;
 					}
 					
-					RequestManager.rejectRequest(request, this);
+					requestManager.rejectRequest(request);
 					sender.sendMessage("§aRejected " + args[2] + "'s request.");
 					return true;
 				} else if (args[1].equals("revoke")) {
@@ -588,7 +589,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						
 						return true;
 					}
-					PermissionRequest request = RequestManager
+					PermissionRequest request = requestManager
 							.getPlayerRequest(args[2]);
 					if (request == null) {
 						sender.sendMessage("§cPlayer '" + args[2] + "' doesn't have a request or doesn't exist.");
@@ -606,7 +607,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						return true;
 					}
 					
-					RequestManager.revokeRequest(request, this);
+					requestManager.revokeRequest(request);
 					sender.sendMessage("§aRevoked " + args[2] + "'s request.");
 					
 					return true;
@@ -682,7 +683,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 			PermissionRequest request = WDLPackets.readPermissionRequest(player, data);
 			
 			// TODO: An event, maybe?
-			RequestManager.addRequest(request, this);
+			requestManager.addRequest(request, this);
 		}
 	}
 

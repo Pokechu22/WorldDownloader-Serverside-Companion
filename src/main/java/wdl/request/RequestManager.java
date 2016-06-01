@@ -17,23 +17,27 @@ import wdl.range.ProtectionRange;
  * Keeps track of requests.
  */
 public class RequestManager {
-	@Deprecated
-	private RequestManager() {
-		throw new AssertionError();
+	public RequestManager(WDLCompanion plugin) {
+		this.plugin = plugin;
 	}
+	
+	/**
+	 * Reference to the plugin instance.
+	 */
+	private WDLCompanion plugin;
 	
 	/**
 	 * Active requests, by player name.
 	 * 
 	 * Player names are lowercased first to help with finding the right player.
 	 */
-	private static Map<String, PermissionRequest> requestsByName = new HashMap<>();
+	private Map<String, PermissionRequest> requestsByName = new HashMap<>();
 	/**
 	 * Active requests, by player ID.
 	 */
-	private static Map<UUID, PermissionRequest> requestsById = new HashMap<>();
+	private Map<UUID, PermissionRequest> requestsById = new HashMap<>();
 	
-	public static void addRequest(PermissionRequest request, WDLCompanion plugin) {
+	public void addRequest(PermissionRequest request, WDLCompanion plugin) {
 		if (requestsById.containsKey(request.playerId)) {
 			PermissionRequest oldRequest = requestsById.get(request.playerId);
 			Player player = Bukkit.getPlayer(oldRequest.playerId);
@@ -89,7 +93,7 @@ public class RequestManager {
 	 * @param player The name of the player (case insensitive).
 	 * @return player's request
 	 */
-	public static PermissionRequest getPlayerRequest(String player) {
+	public PermissionRequest getPlayerRequest(String player) {
 		return requestsByName.get(player.toLowerCase());
 	}
 	
@@ -100,17 +104,13 @@ public class RequestManager {
 	 * @param player The player
 	 * @return player's request
 	 */
-	public static PermissionRequest getPlayerRequest(Player player) {
+	public PermissionRequest getPlayerRequest(Player player) {
 		return requestsById.get(player.getUniqueId());
 	}
 	
-	public static List<PermissionRequest> getRequests() {
+	public List<PermissionRequest> getRequests() {
 		return new ArrayList<>(requestsById.values());
 	}
-	
-	//TODO: I'm not happy with the way that this class is coupled to the plugin
-	//instance - I should either make methods package-level, or the class non-
-	//static, or eliminate the plugin argument...
 	
 	/**
 	 * Accepts the given permission request.
@@ -119,8 +119,7 @@ public class RequestManager {
 	 * @param request
 	 * @param plugin
 	 */
-	public static void acceptRequest(long durationSeconds,
-			PermissionRequest request, WDLCompanion plugin) {
+	public void acceptRequest(long durationSeconds, PermissionRequest request) {
 		if (request.state != PermissionRequest.State.WAITING) {
 			throw new IllegalArgumentException("request is in invalid state!  " +
 					"The state must be 'WAITING'; it actually was " + request.state);
@@ -140,7 +139,7 @@ public class RequestManager {
 		request.expirationTime = System.currentTimeMillis()
 				+ (durationSeconds * 1000);
 		
-		RequestCleanupTask task = new RequestCleanupTask(request, plugin);
+		RequestCleanupTask task = new RequestCleanupTask(request);
 		request.expireTask = task.runTaskLater(plugin, durationSeconds * 20);
 		
 		Player player = Bukkit.getPlayer(request.playerId);
@@ -158,7 +157,7 @@ public class RequestManager {
 		player.sendMessage("§a[WDL] Your permission request has been accepted!");
 	}
 	
-	public static void rejectRequest(PermissionRequest request, WDLCompanion plugin) {
+	public void rejectRequest(PermissionRequest request) {
 		if (request.state != PermissionRequest.State.WAITING) {
 			throw new IllegalArgumentException("request is in invalid state!  " +
 					"The state must be 'WAITING'; it actually was " + request.state);
@@ -172,7 +171,7 @@ public class RequestManager {
 		}
 	}
 	
-	public static void revokeRequest(PermissionRequest request, WDLCompanion plugin) {
+	public void revokeRequest(PermissionRequest request) {
 		if (request.state != PermissionRequest.State.ACCEPTED) {
 			throw new IllegalArgumentException("request is in invalid state!  " +
 					"The state must be 'ACCEPTED'; it actually was " + request.state);
@@ -193,14 +192,12 @@ public class RequestManager {
 		}
 	}
 	
-	private static class RequestCleanupTask extends BukkitRunnable {
-		public RequestCleanupTask(PermissionRequest request, WDLCompanion plugin) {
+	private class RequestCleanupTask extends BukkitRunnable {
+		public RequestCleanupTask(PermissionRequest request) {
 			this.request = request;
-			this.plugin = plugin;
 		}
 		
 		public final PermissionRequest request;
-		private final WDLCompanion plugin;
 		
 		@Override
 		public void run() {
