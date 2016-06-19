@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pokechu22.plugins</groupId>
 	<artifactId>WDLCompanion</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<name>WDL Serverside companion</name>
 	<url>http://dev.bukkit.org/bukkit-plugins/wdl-companion/</url>
 	<description>Provides a set set of permissions that control what World Downloader (https://github.com/pokechu22/WorldDownloader), a mod that allows downloading portions of a multiplayer world for singleplayer use, may download.</description>
