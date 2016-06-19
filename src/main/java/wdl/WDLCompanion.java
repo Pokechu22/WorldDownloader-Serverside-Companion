@@ -418,6 +418,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 				
 				sender.sendMessage("§aUpdated the WDL permissions of " + 
 						updatedCount + " players.");
+				return true;
 			}
 			
 			if (args[0].equals("requests")) {
