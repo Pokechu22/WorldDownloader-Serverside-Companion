@@ -171,7 +171,7 @@ public class LoggingHandler {
 	 */
 	private static class HeaderRolloverStrategy extends DefaultRolloverStrategy {
 		public HeaderRolloverStrategy(Configuration config) {
-			super(1, 7, true, Deflater.DEFAULT_COMPRESSION, config
+			super(1, 1000, true, Deflater.DEFAULT_COMPRESSION, config
 					.getStrSubstitutor());
 		}
 
