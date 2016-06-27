@@ -59,6 +59,7 @@ public class RequestManager {
 						|| oldRequest.state == PermissionRequest.State.ACCEPTED) {
 					player.sendMessage("[WDL] You withdrew your old permission request.");
 					oldRequest.state = PermissionRequest.State.WITHDRAWN;
+					plugin.getServer().getPluginManager().callEvent(new RequestWithdrawnEvent());
 				}
 				
 				plugin.updatePlayer(player);
@@ -68,6 +69,8 @@ public class RequestManager {
 			if (oldRequest.expireTask != null) {
 				oldRequest.expireTask.cancel();
 			}
+			
+			plugin.getServer().getPluginManager().callEvent(new RequestCreatedEvent());
 		}
 		
 		requestsByName.put(request.playerName.toLowerCase(), request);
@@ -155,6 +158,7 @@ public class RequestManager {
 		}
 		
 		player.sendMessage("§a[WDL] Your permission request has been accepted!");
+		plugin.getServer().getPluginManager().callEvent(new RequestAcceptedEvent());
 	}
 	
 	public void rejectRequest(PermissionRequest request) {
@@ -169,6 +173,7 @@ public class RequestManager {
 		if (player != null) {
 			player.sendMessage("§c[WDL] Your permission request has been rejected!");
 		}
+		plugin.getServer().getPluginManager().callEvent(new RequestRejectedEvent());
 	}
 	
 	public void revokeRequest(PermissionRequest request) {
@@ -190,6 +195,7 @@ public class RequestManager {
 			
 			player.sendMessage("§c[WDL] Your permission request has been revoked!");
 		}
+		plugin.getServer().getPluginManager().callEvent(new RequestRevokedEvent());
 	}
 	
 	private class RequestCleanupTask extends BukkitRunnable {
@@ -206,6 +212,7 @@ public class RequestManager {
 			Player player = Bukkit.getPlayer(request.playerId);
 			if (player != null) {
 				plugin.updatePlayer(player);
+				plugin.getServer().getPluginManager().callEvent(new RequestExpiredEvent());
 				player.sendMessage("[WDL] Your requested permissions have expired.");
 			}
 			
