@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>pokechu22.plugins</groupId>
+	<artifactId>log4jstub</artifactId>
+	<version>2.0-beta9_or_2.8.1</version>
+	<name>log4jstub</name>
+	<description>Ugly hack that handles multiple versions of log4j at once</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+				<version>2.5.1</version>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<!-- WDL-specific logging works by editing the server's log4j config. However, 
+			we need to use an out-of-date version, since MC uses one. Yay -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.0-beta9</version>
+			<!--<version>2.8.1</version>-->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.0-beta9</version>
+			<!--<version>2.8.1</version>-->
+		</dependency>
+	</dependencies>
+</project>

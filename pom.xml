@@ -66,22 +66,17 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>pokechu22.plugins</groupId>
+			<artifactId>log4jstub</artifactId>
+			<version>2.0-beta9_or_2.8.1</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mcstats.bukkit</groupId>
 			<artifactId>metrics</artifactId>
 			<version>R8-SNAPSHOT</version>
 			<scope>compile</scope>
-		</dependency>
-		<!-- WDL-specific logging works by editing the server's log4j config. However, 
-			we need to use an out-of-date version, since MC uses one. Yay -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.0-beta9</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.0-beta9</version>
 		</dependency>
 	</dependencies>
 </project>
