@@ -36,6 +36,9 @@ import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import wdl.range.BlockRangeGroupType;
 import wdl.range.IRangeGroup;
 import wdl.range.IRangeGroupType;
@@ -666,14 +669,40 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 							+ loc.getZ() + ".");
 			if (data.length == 0) {
 				getLogger().info(
-						"They are running a version of WDL before 1.8d.");
+						"They are running an extremely old version of WDL (before 1.8d).");
 			} else {
 				try {
-					String version = new String(data, "UTF-8");
-					getLogger().info(
-							"They are running WDL version " + version + ".");
+					String payload = new String(data, "UTF-8");
+					if (payload.startsWith("{")) {
+						JsonObject obj = new JsonParser().parse(payload).getAsJsonObject();
+						if (!obj.has("Version")) {
+							throw new Exception("Missing Version");
+						}
+						if (!obj.has("State")) {
+							throw new Exception("Missing State");
+						}
+						String version = obj.get("Version").getAsString();
+						String state = obj.get("State").getAsString();
+
+						getLogger().info("They are running WDL version " + version + ", in state " + state);
+
+						if (obj.has("X-UpdateNote")) {
+							String updateNote = obj.get("X-UpdateNote").getAsString();
+							if (!updateNote.equals("The plugin message system will be changing shortly.  Please stay tuned.")) {
+								getLogger().info("Client-sent update note: " + updateNote);
+							} else {
+								// We already know of this note
+								getLogger().fine("Client-sent update note: " + updateNote);
+							}
+						}
+					} else {
+						getLogger().info("They are running an old WDL version, " + payload);
+					}
 				} catch (UnsupportedEncodingException e) {
 					throw new Error(":(", e);
+				} catch (Exception e) {
+					player.kickPlayer("Malformed WDL|INIT packet: " + e.getMessage());
+					getLogger().log(Level.WARNING, "Received a malformed WDL|INIT packet from " + player, e);
 				}
 			}
 			
