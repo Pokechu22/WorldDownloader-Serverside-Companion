@@ -36,6 +36,7 @@ import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
 import org.mcstats.Metrics.Plotter;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -78,6 +79,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	 */
 	public static final String REQUEST_CHANNEL_NAME_112 = "WDL|REQUEST",
 			REQUEST_CHANNEL_NAME_113 = "wdl:request";
+
+	private static final Set<String> KNOWN_UPDATE_NOTES = ImmutableSet.of(
+			"The plugin message system will be changing shortly.  Please stay tuned.",
+			"For 1.13 compatibility, please update your plugin as channel names have changed."
+	);
 
 	/**
 	 * Cached entity ranges.
@@ -718,7 +724,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 
 						if (obj.has("X-UpdateNote")) {
 							String updateNote = obj.get("X-UpdateNote").getAsString();
-							if (!updateNote.equals("The plugin message system will be changing shortly.  Please stay tuned.")) {
+							if (!KNOWN_UPDATE_NOTES.contains(updateNote)) {
 								getLogger().info("Client-sent update note: " + updateNote);
 							} else {
 								// We already know of this note
