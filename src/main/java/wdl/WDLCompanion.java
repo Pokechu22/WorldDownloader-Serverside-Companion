@@ -2,7 +2,7 @@ package wdl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,24 +57,27 @@ import wdl.request.RequestManager;
  * 
  * @author Pokechu22
  * 
- * @see <a href="http://wiki.vg/User:Pokechu22/World_downloader">The protocol doc</a>
+ * @see <a href="http://wiki.vg/Plugin_channels/World_downloader">The protocol doc</a>
  */
 public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageListener {
 	/**
 	 * The name of the plugin channel sent by WDL to signify that it is ready to
 	 * receive permissions.
 	 */
-	public static final String INIT_CHANNEL_NAME = "WDL|INIT";
+	public static final String INIT_CHANNEL_NAME_112 = "WDL|INIT",
+			INIT_CHANNEL_NAME_113 = "wdl:init";
 	
 	/**
 	 * The name of the plugin channel used for WDL control.
 	 */
-	public static final String CONTROL_CHANNEL_NAME = "WDL|CONTROL";
+	public static final String CONTROL_CHANNEL_NAME_112 = "WDL|CONTROL",
+			CONTROL_CHANNEL_NAME_113 = "wdl:control";
 	
 	/**
 	 * The name of the plugin channel used by WDL to request new permissions.
 	 */
-	public static final String REQUEST_CHANNEL_NAME = "WDL|REQUEST";
+	public static final String REQUEST_CHANNEL_NAME_112 = "WDL|REQUEST",
+			REQUEST_CHANNEL_NAME_113 = "wdl:request";
 
 	/**
 	 * Cached entity ranges.
@@ -118,11 +121,23 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		this.saveDefaultConfig();
 
 		this.getServer().getMessenger()
-				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME, this);
+				.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME_113, this);
 		this.getServer().getMessenger()
-				.registerIncomingPluginChannel(this, REQUEST_CHANNEL_NAME, this);
+				.registerIncomingPluginChannel(this, REQUEST_CHANNEL_NAME_113, this);
 		this.getServer().getMessenger()
-				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
+				.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME_113);
+
+		try {
+			this.getServer().getMessenger()
+					.registerIncomingPluginChannel(this, INIT_CHANNEL_NAME_112, this);
+			this.getServer().getMessenger()
+					.registerIncomingPluginChannel(this, REQUEST_CHANNEL_NAME_112, this);
+			this.getServer().getMessenger()
+					.registerOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME_112);
+		} catch (Exception ex) {
+			getLogger().log(Level.FINE, "Couldn't register 1.12 plugin channels; this is normal on 1.13 and above", ex);
+		}
+
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
 		this.permissionHandler = new PermissionHandler(this);
@@ -251,11 +266,21 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	@Override
 	public void onDisable() {
 		this.getServer().getMessenger()
-				.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME);
+				.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME_113);
 		this.getServer().getMessenger()
-				.unregisterIncomingPluginChannel(this, REQUEST_CHANNEL_NAME);
+				.unregisterIncomingPluginChannel(this, REQUEST_CHANNEL_NAME_113);
 		this.getServer().getMessenger()
-				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME);
+				.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME_113);
+		try {
+			this.getServer().getMessenger()
+					.unregisterIncomingPluginChannel(this, INIT_CHANNEL_NAME_112);
+			this.getServer().getMessenger()
+					.unregisterIncomingPluginChannel(this, REQUEST_CHANNEL_NAME_112);
+			this.getServer().getMessenger()
+					.unregisterOutgoingPluginChannel(this, CONTROL_CHANNEL_NAME_112);
+		} catch (Exception ex) {
+			getLogger().log(Level.FINE, "Couldn't unregister 1.12 plugin messages; this is normal on 1.13 and above", ex);
+		}
 	}
 	
 	@EventHandler
@@ -343,11 +368,11 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					return true;
 				}
 				Player player = (Player)sender;
-				if (!player.getListeningPluginChannels()
-						.contains(CONTROL_CHANNEL_NAME)) {
+				if (!(player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_113) ||
+						player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_112))) {
 					sender.sendMessage("§cYou don't have WDL installed!");
 					sender.sendMessage("§c(not listening on "
-							+ CONTROL_CHANNEL_NAME + ")");
+							+ CONTROL_CHANNEL_NAME_113 + " or " + CONTROL_CHANNEL_NAME_112 + ")");
 					return true;
 				}
 				
@@ -392,12 +417,12 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					return true;
 				}
 				
-				if (!player.getListeningPluginChannels()
-						.contains(CONTROL_CHANNEL_NAME)) {
+				if (!(player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_113) ||
+						player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_112))) {
 					sender.sendMessage("§c" + player.getDisplayName() + 
 							" doesn't have WDL installed!");
 					sender.sendMessage("§c(not listening on "
-							+ CONTROL_CHANNEL_NAME + ")");
+							+ CONTROL_CHANNEL_NAME_113 + " or " + CONTROL_CHANNEL_NAME_112 + ")");
 					return true;
 				}
 				
@@ -634,8 +659,8 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	public int updateAllPlayers() {
 		int updatedCount = 0;
 		for (Player player : getServer().getOnlinePlayers()) {
-			if (player.getListeningPluginChannels().contains(
-					CONTROL_CHANNEL_NAME)) {
+			if (player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_113) ||
+					player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_112)) {
 				updatePlayer(player);
 				updatedCount++;
 			}
@@ -650,16 +675,21 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 	public void updatePlayer(Player player) {
 		byte[][] packets = createWDLPackets(player);
 		
+		String channel;
+		if (player.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_113)) {
+			channel = CONTROL_CHANNEL_NAME_113;
+		} else {
+			channel = CONTROL_CHANNEL_NAME_112;
+		}
 		for (byte[] packet : packets) {
-			player.sendPluginMessage(this, CONTROL_CHANNEL_NAME,
-					packet);
+			player.sendPluginMessage(this, channel, packet);
 		}
 	}
 	
 	@Override
 	public void onPluginMessageReceived(String channel, Player player,
 			byte[] data) {
-		if (channel.equals(INIT_CHANNEL_NAME)) {
+		if (channel.equals(INIT_CHANNEL_NAME_113) || channel.equals(INIT_CHANNEL_NAME_112)) {
 			getLogger().info("Player " + player.getName() + 
 					" has WDL installed.");
 			Location loc = player.getLocation();
@@ -672,7 +702,7 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 						"They are running an extremely old version of WDL (before 1.8d).");
 			} else {
 				try {
-					String payload = new String(data, "UTF-8");
+					String payload = new String(data, StandardCharsets.UTF_8);
 					if (payload.startsWith("{")) {
 						JsonObject obj = new JsonParser().parse(payload).getAsJsonObject();
 						if (!obj.has("Version")) {
@@ -698,18 +728,16 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 					} else {
 						getLogger().info("They are running an old WDL version, " + payload);
 					}
-				} catch (UnsupportedEncodingException e) {
-					throw new Error(":(", e);
 				} catch (Exception e) {
-					player.kickPlayer("Malformed WDL|INIT packet: " + e.getMessage());
-					getLogger().log(Level.WARNING, "Received a malformed WDL|INIT packet from " + player, e);
+					player.kickPlayer("Malformed WDL init packet: " + e.getMessage());
+					getLogger().log(Level.WARNING, "Received a malformed WDL init packet from " + player, e);
 				}
 			}
 			
 			updatePlayer(player);
 		}
 		
-		if (channel.equals(REQUEST_CHANNEL_NAME)) {
+		if (channel.equals(REQUEST_CHANNEL_NAME_113) || channel.equals(REQUEST_CHANNEL_NAME_112)) {
 			PermissionRequest request = WDLPackets.readPermissionRequest(player, data);
 			
 			// TODO: An event, maybe?
@@ -975,8 +1003,13 @@ public class WDLCompanion extends JavaPlugin implements Listener, PluginMessageL
 		
 		synchronized (packetsToSend) {
 			boolean addRunnable = packetsToSend.isEmpty();
-			
-			PacketInfo packet = new PacketInfo(to, CONTROL_CHANNEL_NAME, data);
+
+			PacketInfo packet;
+			if (to.getListeningPluginChannels().contains(CONTROL_CHANNEL_NAME_113)) {
+				packet = new PacketInfo(to, CONTROL_CHANNEL_NAME_113, data);
+			} else {
+				packet = new PacketInfo(to, CONTROL_CHANNEL_NAME_112, data);
+			}
 			
 			packetsToSend.add(packet);
 			

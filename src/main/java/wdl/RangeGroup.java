@@ -267,8 +267,8 @@ class RangeGroup implements IRangeGroup {
 		if (this.isDisposed) {
 			throw new IllegalStateException("This RangeGroup has been disposed!  You shouldn't be using it anymore (or even have an instance!)");
 		}
-		return player.getListeningPluginChannels().contains(
-				WDLCompanion.CONTROL_CHANNEL_NAME);
+		return player.getListeningPluginChannels().contains(WDLCompanion.CONTROL_CHANNEL_NAME_113) ||
+				player.getListeningPluginChannels().contains(WDLCompanion.CONTROL_CHANNEL_NAME_112);
 	}
 	
 	/**
